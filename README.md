@@ -4,7 +4,9 @@ Gex is a full-stack Node.js app for URL shortening, media scraping, file downloa
 
 ---
 
-## ⚠️ Reddit API Setup (Required)
+## Reddit API Setup (Optional)
+
+If you want to use without it just run the server.js, then head to lcoalhost:8080/(example chtlogin, imgtfile)
 
 To enable Reddit login, you must edit `server.js`.
 
@@ -52,3 +54,31 @@ Install on Arch:
 ```
 sudo pacman -S nodejs npm ffmpeg chromium
 ```
+### Usage:
+Clone the repository:
+```
+git clone https://github.com/Deadassassin/gex.git
+cd gex/Redditimage
+```
+Install dependencies:
+```
+npm install
+```
+Start the server:
+```
+node server.js
+```
+Open the application in your browser:
+```
+http://localhost:8080
+```
+### Features:
+URL shortening with persistent JSON storage
+
+Media scraping using Axios with Puppeteer fallback for dynamic content
+
+Direct download preview for file size, type, and name
+
+Optional real-time chat system using WebSocket
+
+Optional system monitoring that logs request activity, IP, location, and system usage
