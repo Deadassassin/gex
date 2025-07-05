@@ -1,27 +1,54 @@
 # Gex
 
-Gex is a full-stack application that provides URL shortening, media scraping, and file downloading functionality. It is designed to be efficient, user-friendly, and easily extensible.
+Gex is a full-stack Node.js app for URL shortening, media scraping, file downloading, and more. It includes optional real-time chat and system monitoring.
 
-## Features
+---
 
-- **URL Shortening**  
-  Generate custom short links and store them in a persistent database.
+## ⚠️ Reddit API Setup (Required)
 
-- **Media Scraper**  
-  Extract images and videos from any webpage using both static and headless methods (Axios + Puppeteer fallback).
+To enable Reddit login, you must edit `server.js`.
 
-- **Direct Downloads**  
-  Fetch and preview direct image/video URLs with file size and type detection.
+### Steps:
 
-- **Real-Time Chat (Optional)**  
-  WebSocket-powered chat system with file upload and profile customization.
+1. Go to [https://www.reddit.com/prefs/apps](https://www.reddit.com/prefs/apps)
 
-- **System Monitoring (Optional)**  
-  Displays server request logs and basic network statistics.
+2. Click **Create App**, choose `installed app`
 
-## Installation
+3. Fill in:
+   - **Name**: Anything
+   - **Redirect URI**:  
+     ```
+     http://localhost:8080
+     ```
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Deadassassin/gex.git
-   cd gex/Redditimage
+4. Click **Create App**
+
+5. Copy the **client ID**
+
+6. In `server.js`, find the Reddit section and set:
+   ```js
+   const CLIENT_ID = 'your-client-id-here';
+   const REDIRECT_URI = 'http://localhost:8080';
+### Required Dependencies:
+1. Made simple copy and paste
+```
+npm install express path node-fetch os ws geoip-lite systeminformation cors http body-parser fs crypto multer sharp fluent-ffmpeg cheerio axios image-size puppeteer nanoid useragent
+```
+2. Then required apps
+Install these system-level apps:
+
+Node.js + npm – runs the server
+
+ffmpeg – for video processing
+
+Chromium or Google Chrome – required for Puppeteer scraping
+
+Install on Debian/Ubuntu:
+```
+sudo apt update
+sudo apt install nodejs npm ffmpeg chromium
+```
+Install on Arch:
+```
+sudo pacman -S nodejs npm ffmpeg chromium
+```
