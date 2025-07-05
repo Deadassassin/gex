@@ -963,6 +963,10 @@ let domUrls = [];
   }
 });
 
+app.get('/api/shortened-urls', (req, res) => {
+  shortenerDB.read(); // Ensure it's fresh
+  res.json({ success: true, links: shortenerDB.data.links });
+});
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://localhost:${PORT}`);
