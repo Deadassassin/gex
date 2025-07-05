@@ -1,6 +1,6 @@
 # Gex
 
-Gex is a full-stack Node.js app for URL shortening, media scraping, file downloading, and more. It includes optional real-time chat and system monitoring.
+Gex is a full-stack Node.js web app with many features and more to come (soon).
 
 ---
 
