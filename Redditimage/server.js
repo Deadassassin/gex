@@ -33,8 +33,8 @@ const shortenerDB = new LowSync(shortenerAdapter, { links: [] }); // ← default
 shortenerDB.read();
 shortenerDB.write(); // write if new
 
-const CLIENT_ID = 'dZozLujKeYD0x_7oXOyjAQ';
-const REDIRECT_URI = 'https://verified-thrush-unduly.ngrok-free.app/callback';
+const CLIENT_ID = 'your-client-id-here';
+const REDIRECT_URI = 'your-redirect-uri-here';
 const USER_FILE = path.join(__dirname, 'chatreg.json');
 let users = {};
 if (fs.existsSync(USER_FILE)) {
