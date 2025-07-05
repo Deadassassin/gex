@@ -24,4 +24,4 @@ Gex is a full-stack application that provides URL shortening, media scraping, an
 1. **Clone the repository**
    ```bash
    git clone https://github.com/Deadassassin/gex.git
-   cd gex
+   cd gex/Redditimage
