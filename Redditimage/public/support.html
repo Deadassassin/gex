@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vexsy Support</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #94a3b8;
+      --card-bg: #ffffff;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f9fafb 0%, #f1f5f9 100%);
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    
+    header {
+      background: var(--dark);
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+    
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+    
+    main {
+      flex: 1;
+      padding: 2rem 1.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    
+    h1 {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(to right, var(--primary), var(--primary-dark));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    
+    h2 {
+      color: var(--dark);
+      font-weight: 600;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    section {
+      margin-bottom: 2.5rem;
+      background: var(--card-bg);
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      transition: var(--transition);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+    
+    section:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
+    }
+    
+    p {
+      color: var(--dark);
+      opacity: 0.9;
+      font-size: 1.05rem;
+      margin-top: 0.5rem;
+    }
+    
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--dark);
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+    
+    .fa {
+      color: var(--primary);
+    }
+    
+    .cta-button {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+      margin-top: 1rem;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.3);
+    }
+    
+    .cta-button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+    }
+    
+    @media (max-width: 768px) {
+      main {
+        padding: 1.5rem 1rem;
+      }
+      
+      section {
+        padding: 1.5rem;
+      }
+      
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-content">
+      <i class="fas fa-life-ring fa-lg"></i>
+      <h2>Vexsy Support</h2>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h1>Need Help with Vexsy?</h1>
+      <p>We're here to help you get the most out of Vexsy. Whether you're troubleshooting an issue or just have questions, you're in the right place.</p>
+      <button class="cta-button">Contact Support</button>
+    </section>
+
+    <section>
+      <h2><i class="fas fa-bug"></i> Report a Bug</h2>
+      <p>Found something that's not working as expected? Help us improve by reporting bugs through our GitHub issues page or by messaging @vexsydev directly.</p>
+      <button class="cta-button">Report Issue</button>
+    </section>
+
+    <section>
+      <h2><i class="fas fa-book"></i> Documentation</h2>
+      <p>Our comprehensive documentation is coming soon. While we're in alpha, feel free to explore and experiment - your feedback helps shape Vexsy's future.</p>
+    </section>
+
+    <section>
+      <h2><i class="fas fa-user-secret"></i> Privacy First</h2>
+      <p>Your privacy matters. Vexsy operates with a privacy-first approach - no tracking, no unnecessary data collection. The only data we access is what you explicitly provide through Reddit authentication.</p>
+    </section>
+  </main>
+
+  <footer>
+    &copy; 2025 Vexsy Team. Open source and community-driven.
+  </footer>
+</body>
+</html>

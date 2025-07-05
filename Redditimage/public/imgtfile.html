@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Media Downloader</title>
+  <style>
+    :root {
+      --primary: hsl(210, 75%, 60%);
+      --primary-dark: hsl(210, 65%, 50%);
+      --bg: hsl(0, 0%, 6%);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text: hsl(0, 0%, 95%);
+      --text-muted: hsl(0, 0%, 65%);
+      --success: hsl(120, 60%, 55%);
+      --error: hsl(0, 80%, 60%);
+      --glass-blur: 20px;
+      --radius: 24px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(at 80% 0%, hsla(210, 100%, 20%, 0.2) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(210, 100%, 20%, 0.2) 0px, transparent 50%);
+    }
+    
+    @supports (font-variation-settings: normal) {
+      body { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.1),
+        0 0 0 1px var(--card-border);
+      margin-bottom: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    
+    h1 {
+      margin: 0 0 20px;
+      font-size: 1.8rem;
+      text-align: center;
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, var(--primary), hsl(210, 80%, 70%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
+    }
+    
+    .input-group {
+      margin-bottom: 24px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    
+    input[type="text"] {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: calc(var(--radius) - 8px);
+      font-size: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      transition: var(--transition);
+      font-family: inherit;
+    }
+    
+    input[type="text"]:hover {
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+    
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: calc(var(--radius) - 8px);
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+      opacity: 0;
+      transition: var(--transition);
+      z-index: -1;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+    }
+    
+    button:hover::before {
+      opacity: 1;
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      background: hsl(0, 0%, 30%);
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    
+    .status {
+      padding: 16px;
+      border-radius: calc(var(--radius) - 8px);
+      margin: 20px 0;
+      text-align: center;
+      font-size: 0.95rem;
+      transition: var(--transition);
+      transform-origin: top;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .status.info {
+      background: rgba(74, 144, 226, 0.15);
+      border: 1px solid rgba(74, 144, 226, 0.2);
+    }
+    
+    .status.success {
+      background: rgba(76, 175, 80, 0.15);
+      border: 1px solid rgba(76, 175, 80, 0.2);
+    }
+    
+    .status.error {
+      background: rgba(244, 67, 54, 0.15);
+      border: 1px solid rgba(244, 67, 54, 0.2);
+    }
+    
+    .media-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    
+    .media-item {
+      border-radius: calc(var(--radius) - 8px);
+      overflow: hidden;
+      background: rgba(0, 0, 0, 0.3);
+      transition: var(--transition);
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: fadeIn 0.4s ease-out;
+      animation-fill-mode: both;
+    }
+    
+    .media-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+      border-color: rgba(255,255,255,0.1);
+    }
+    
+    .media-preview {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      display: block;
+      background: linear-gradient(135deg, #1e1e1e, #2a2a2a);
+    }
+    
+    .media-info {
+      padding: 12px;
+    }
+    
+    .media-name {
+      font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    
+    .media-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .download-btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    .download-btn:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 3px;
+      margin-top: 12px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), hsl(210, 80%, 65%));
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+      border-radius: 3px;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .tab-container {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      position: relative;
+    }
+    
+    .tab-container::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      height: 2px;
+      width: 50%;
+      background: var(--primary);
+      transition: var(--transition);
+      z-index: 1;
+    }
+    
+    .tab-container[data-active-tab="direct"]::after {
+      transform: translateX(100%);
+    }
+    
+    .tab {
+      padding: 12px 0;
+      cursor: pointer;
+      flex: 1;
+      text-align: center;
+      font-weight: 500;
+      color: var(--text-muted);
+      transition: var(--transition);
+      position: relative;
+    }
+    
+    .tab.active {
+      color: var(--primary);
+    }
+    
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease-out;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .version {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+    
+    .version:hover {
+      opacity: 1;
+    }
+    
+    @media (max-width: 600px) {
+      :root {
+        --radius: 20px;
+      }
+      
+      body {
+        padding: 12px;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .media-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+    
+    /* Individual animation delays for media items */
+    .media-item:nth-child(1) { animation-delay: 0.1s; }
+    .media-item:nth-child(2) { animation-delay: 0.2s; }
+    .media-item:nth-child(3) { animation-delay: 0.3s; }
+    .media-item:nth-child(4) { animation-delay: 0.4s; }
+    .media-item:nth-child(5) { animation-delay: 0.5s; }
+    .media-item:nth-child(6) { animation-delay: 0.6s; }
+    .media-item:nth-child(7) { animation-delay: 0.7s; }
+    .media-item:nth-child(8) { animation-delay: 0.8s; }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>Media Downloader</h1>
+      
+      <div class="tab-container" id="tabContainer">
+        <div class="tab active" data-tab="scrape">Scrape Webpage</div>
+        <div class="tab" data-tab="direct">Direct Download</div>
+      </div>
+      
+      <div class="tab-content active" id="scrape-tab">
+        <div class="input-group">
+          <label for="url">Enter webpage URL to scrape:</label>
+          <input type="text" id="url" placeholder="https://example.com" required>
+        </div>
+        
+        <button id="scrapeBtn">
+          <span id="scrapeBtnText">Find Media</span>
+          <span id="scrapeBtnLoader" class="loading" style="display: none;"></span>
+        </button>
+      </div>
+      
+      <div class="tab-content" id="direct-tab">
+        <div class="input-group">
+          <label for="directUrl">Enter direct image URL:</label>
+          <input type="text" id="directUrl" placeholder="https://example.com/image.jpg" required>
+        </div>
+        
+        <button id="directDownloadBtn">
+          <span id="directBtnText">Download Image</span>
+          <span id="directBtnLoader" class="loading" style="display: none;"></span>
+        </button>
+      </div>
+      
+      <div id="status" class="status info" style="display: none;">
+        <span id="statusText"></span>
+      </div>
+      
+      <div id="progressContainer" style="display: none;">
+        <div class="progress-bar">
+          <div id="progress" class="progress"></div>
+        </div>
+        <div id="progressText" style="text-align: center; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);"></div>
+      </div>
+      
+      <div id="mediaContainer" class="media-grid"></div>
+    </div>
+  </div>
+
+  <div class="version">v1.2.0</div>
+
+  <script>
+    // DOM Elements
+    const scrapeBtn = document.getElementById('scrapeBtn');
+    const scrapeBtnText = document.getElementById('scrapeBtnText');
+    const scrapeBtnLoader = document.getElementById('scrapeBtnLoader');
+    const directDownloadBtn = document.getElementById('directDownloadBtn');
+    const directBtnText = document.getElementById('directBtnText');
+    const directBtnLoader = document.getElementById('directBtnLoader');
+    const urlInput = document.getElementById('url');
+    const directUrlInput = document.getElementById('directUrl');
+    const statusEl = document.getElementById('status');
+    const statusText = document.getElementById('statusText');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progress');
+    const progressText = document.getElementById('progressText');
+    const mediaContainer = document.getElementById('mediaContainer');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const tabContainer = document.getElementById('tabContainer');
+    
+    let mediaItems = [];
+    
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabName = tab.dataset.tab;
+        
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+        tabContainer.setAttribute('data-active-tab', tabName);
+        
+        // Clear previous results when switching tabs
+        mediaContainer.innerHTML = '';
+        statusEl.style.display = 'none';
+        progressContainer.style.display = 'none';
+      });
+    });
+    
+    // Update status message
+    function setStatus(message, type = 'info') {
+      statusEl.style.display = 'block';
+      statusEl.className = `status ${type}`;
+      statusText.textContent = message;
+      
+      // Auto-hide success messages after 5 seconds
+      if (type === 'success') {
+        setTimeout(() => {
+          if (statusEl.className.includes('success')) {
+            statusEl.style.display = 'none';
+          }
+        }, 5000);
+      }
+    }
+    
+    // Update progress bar
+    function updateProgress(current, total) {
+      const percent = Math.round((current / total) * 100);
+      progressBar.style.width = `${percent}%`;
+      progressText.textContent = total > 1 
+        ? `Downloading ${current} of ${total} files (${percent}%)`
+        : `Downloading file...`;
+    }
+    
+    // Create media item element
+    function createMediaElement(item, index) {
+      const mediaEl = document.createElement('div');
+      mediaEl.className = 'media-item';
+      mediaEl.style.animationDelay = `${index * 0.1}s`;
+      
+      // Determine file type
+      const isImage = item.file.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i);
+      const isVideo = item.file.match(/\.(mp4|webm|mov|avi|mkv)$/i);
+      
+      mediaEl.innerHTML = `
+        ${isImage ? 
+          `<img src="${item.from}" class="media-preview" alt="${item.file}" loading="lazy">` : 
+          isVideo ?
+          `<video class="media-preview" muted loop playsinline>
+            <source src="${item.from}" type="video/mp4">
+          </video>` :
+          `<div class="media-preview" style="display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e1e1e, #2a2a2a);">
+            <span style="color: var(--text-muted); font-size: 0.7rem;">${item.file.split('.').pop().toUpperCase()}</span>
+          </div>`
+        }
+        <div class="media-info">
+          <div class="media-name" title="${item.file}">${item.file}</div>
+          <div class="media-actions">
+            <a href="${item.from}" class="download-btn" download="${item.file}" onclick="event.stopPropagation();">Download</a>
+            <span style="font-size: 0.7rem; color: var(--text-muted)">
+              ${item.size ? `${(item.size / 1024).toFixed(1)} KB` : 'Size unknown'}
+            </span>
+          </div>
+        </div>
+      `;
+      
+      // Add click to preview larger
+      mediaEl.addEventListener('click', (e) => {
+        if (e.target.tagName !== 'A' && e.target.tagName !== 'BUTTON') {
+          previewMedia(item.from, item.file);
+        }
+      });
+      
+      return mediaEl;
+    }
+    
+    // Preview media in modal
+    function previewMedia(url, filename) {
+      const isImage = filename.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i);
+      const isVideo = filename.match(/\.(mp4|webm|mov|avi|mkv)$/i);
+      
+      const modal = document.createElement('div');
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100%';
+      modal.style.height = '100%';
+      modal.style.backgroundColor = 'rgba(0,0,0,0.9)';
+      modal.style.display = 'flex';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.zIndex = '1000';
+      modal.style.backdropFilter = 'blur(10px)';
+      modal.style.cursor = 'pointer';
+      modal.style.opacity = '0';
+      modal.style.transition = 'opacity 0.3s ease';
+      
+      const content = document.createElement('div');
+      content.style.position = 'relative';
+      content.style.maxWidth = '90%';
+      content.style.maxHeight = '90%';
+      content.style.cursor = 'default';
+      
+      if (isImage) {
+        const img = document.createElement('img');
+        img.src = url;
+        img.style.maxWidth = '100%';
+        img.style.maxHeight = '90vh';
+        img.style.borderRadius = '12px';
+        img.style.objectFit = 'contain';
+        content.appendChild(img);
+      } else if (isVideo) {
+        const video = document.createElement('video');
+        video.src = url;
+        video.controls = true;
+        video.autoplay = true;
+        video.style.maxWidth = '100%';
+        video.style.maxHeight = '90vh';
+        video.style.borderRadius = '12px';
+        content.appendChild(video);
+      } else {
+        const placeholder = document.createElement('div');
+        placeholder.style.width = '300px';
+        placeholder.style.height = '200px';
+        placeholder.style.backgroundColor = '#1e1e1e';
+        placeholder.style.borderRadius = '12px';
+        placeholder.style.display = 'flex';
+        placeholder.style.alignItems = 'center';
+        placeholder.style.justifyContent = 'center';
+        placeholder.style.color = 'var(--text-muted)';
+        placeholder.textContent = 'Preview not available';
+        content.appendChild(placeholder);
+      }
+      
+      // Download button
+      const downloadBtn = document.createElement('a');
+      downloadBtn.href = url;
+      downloadBtn.download = filename;
+      downloadBtn.textContent = 'Download';
+      downloadBtn.style.position = 'absolute';
+      downloadBtn.style.bottom = '20px';
+      downloadBtn.style.right = '20px';
+      downloadBtn.style.padding = '10px 20px';
+      downloadBtn.style.backgroundColor = 'var(--primary)';
+      downloadBtn.style.color = 'white';
+      downloadBtn.style.borderRadius = '8px';
+      downloadBtn.style.textDecoration = 'none';
+      downloadBtn.style.fontWeight = '500';
+      downloadBtn.style.transition = 'var(--transition)';
+      downloadBtn.addEventListener('mouseenter', () => {
+        downloadBtn.style.transform = 'translateY(-2px)';
+        downloadBtn.style.boxShadow = '0 4px 10px rgba(74, 144, 226, 0.3)';
+      });
+      downloadBtn.addEventListener('mouseleave', () => {
+        downloadBtn.style.transform = 'none';
+        downloadBtn.style.boxShadow = 'none';
+      });
+      content.appendChild(downloadBtn);
+      
+      modal.appendChild(content);
+      document.body.appendChild(modal);
+      
+      // Fade in
+      setTimeout(() => {
+        modal.style.opacity = '1';
+      }, 10);
+      
+      // Close on click
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.opacity = '0';
+          setTimeout(() => {
+            modal.remove();
+          }, 300);
+        }
+      });
+      
+      // Close on ESC
+      document.addEventListener('keydown', function escClose(e) {
+        if (e.key === 'Escape') {
+          modal.style.opacity = '0';
+          setTimeout(() => {
+            modal.remove();
+          }, 300);
+          document.removeEventListener('keydown', escClose);
+        }
+      });
+    }
+    
+    // Process a single direct image URL
+    async function processDirectImage(url) {
+      try {
+        directDownloadBtn.disabled = true;
+        directBtnText.textContent = 'Processing...';
+        directBtnLoader.style.display = 'inline-block';
+        mediaContainer.innerHTML = '';
+        setStatus('Processing image...');
+        progressContainer.style.display = 'block';
+        updateProgress(0, 1);
+        
+        // Extract filename from URL or generate one
+        let filename = url.split('/').pop().split('?')[0].split('#')[0];
+        if (!filename || !filename.includes('.')) {
+          const ext = url.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)/i)?.[1] || 'jpg';
+          filename = `image_${Date.now()}.${ext}`;
+        }
+        
+        // Get file size
+        let fileSize = 0;
+        try {
+          const headResponse = await fetch(url, { method: 'HEAD' });
+          const contentLength = headResponse.headers.get('content-length');
+          fileSize = contentLength ? parseInt(contentLength) : 0;
+        } catch (e) {
+          console.warn('Could not get file size:', e);
+        }
+        
+        const mediaItem = {
+          file: filename,
+          from: url,
+          size: fileSize
+        };
+        
+        // Add to DOM
+        mediaContainer.appendChild(createMediaElement(mediaItem, 0));
+        updateProgress(1, 1);
+        
+        setStatus('Image ready for download', 'success');
+      } catch (error) {
+        console.error('Direct download failed:', error);
+        setStatus(`Error: ${error.message}`, 'error');
+      } finally {
+        directDownloadBtn.disabled = false;
+        directBtnText.textContent = 'Download Image';
+        directBtnLoader.style.display = 'none';
+      }
+    }
+    
+    // Scrape media from URL
+    async function scrapeMedia() {
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        setStatus('Please enter a valid URL', 'error');
+        return;
+      }
+      
+      try {
+        // Reset UI
+        scrapeBtn.disabled = true;
+        scrapeBtnText.textContent = 'Searching...';
+        scrapeBtnLoader.style.display = 'inline-block';
+        mediaContainer.innerHTML = '';
+        setStatus('Finding media files on the page...');
+        
+        // Make request to server
+        const response = await fetch('/imgtfile', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success || !data.media || data.media.length === 0) {
+          setStatus('No media files found on this page.', 'error');
+          return;
+        }
+        
+        mediaItems = data.media;
+        setStatus(`Found ${mediaItems.length} media files`, 'success');
+        
+        // Show progress bar
+        progressContainer.style.display = 'block';
+        updateProgress(0, mediaItems.length);
+        
+        // Process each media item
+        for (let i = 0; i < mediaItems.length; i++) {
+          const item = mediaItems[i];
+          
+          try {
+            // Get file size (this is a simplified approach)
+            const headResponse = await fetch(item.from, { method: 'HEAD' });
+            const contentLength = headResponse.headers.get('content-length');
+            item.size = contentLength ? parseInt(contentLength) : 0;
+            
+            // Add to DOM
+            mediaContainer.appendChild(createMediaElement(item, i));
+            
+            // Update progress
+            updateProgress(i + 1, mediaItems.length);
+          } catch (err) {
+            console.error(`Error processing ${item.file}:`, err);
+          }
+        }
+        
+        setStatus('All media files are ready for download', 'success');
+      } catch (error) {
+        console.error('Scraping failed:', error);
+        setStatus(`Error: ${error.message}`, 'error');
+      } finally {
+        scrapeBtn.disabled = false;
+        scrapeBtnText.textContent = 'Find Media';
+        scrapeBtnLoader.style.display = 'none';
+      }
+    }
+    
+    // Event listeners
+    scrapeBtn.addEventListener('click', scrapeMedia);
+    directDownloadBtn.addEventListener('click', () => {
+      const url = directUrlInput.value.trim();
+      if (url) {
+        processDirectImage(url);
+      } else {
+        setStatus('Please enter a valid image URL', 'error');
+      }
+    });
+    
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        scrapeMedia();
+      }
+    });
+    
+    directUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const url = directUrlInput.value.trim();
+        if (url) {
+          processDirectImage(url);
+        }
+      }
+    });
+    
+    // Initial status
+    setStatus('Enter a URL and click the appropriate button to begin', 'info');
+  </script>
+</body>
+</html>

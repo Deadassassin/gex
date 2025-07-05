@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexemy 0.5.8-beta</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+          --primary: #6c5ce7;
+          --primary-light: #a29bfe;
+          --secondary: #715aff;
+          --dark: rgba(20, 20, 30, 0.6);
+          --darker: rgba(10, 10, 15, 0.6);
+          --light: #f1f2f6;
+          --gray: #a4b0be;
+          --success: #00b894;
+          --danger: #ff4757;
+          --radius: 16px;
+          --shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+          --glass-bg: rgba(255, 255, 255, 0.05);
+          --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+          font-family: 'Inter', sans-serif;
+        }
+
+        body {
+          background: linear-gradient(135deg, #1f1c2c, #928dab);
+          color: var(--light);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          line-height: 1.6;
+          animation: fadeInBody 1s ease;
+        }
+
+        @keyframes fadeInBody {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        .container {
+          display: grid;
+          grid-template-columns: 80px 200px 1fr 250px;
+          gap: 20px;
+          height: 100vh;
+          max-width: 100%;
+          margin: 0 auto;
+          padding: 20px;
+          animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+
+        @media (max-width: 1200px) {
+          .container {
+            grid-template-columns: 80px 1fr 250px;
+          }
+          #channellist {
+            display: none;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .container {
+            grid-template-columns: 1fr;
+          }
+          #serverlist, #userlist, #channellist {
+            display: none;
+          }
+        }
+
+        header {
+          grid-column: 1 / -1;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--glass-border);
+          animation: fadeSlideDown 0.6s ease;
+        }
+
+        @keyframes fadeSlideDown {
+          from { opacity: 0; transform: translateY(-15px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+          font-size: 24px;
+          font-weight: 600;
+          color: var(--primary-light);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .logo {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: var(--primary);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+
+        #chatbox {
+          background: var(--glass-bg);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          border: 1px solid var(--glass-border);
+          padding: 20px;
+          height: calc(100vh - 180px);
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          animation: popFade 0.5s ease;
+        }
+
+        @keyframes popFade {
+          0% { opacity: 0; transform: scale(0.95); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+
+        .message {
+          animation: floatIn 0.4s ease-out;
+          padding: 14px 18px;
+          border-radius: var(--radius);
+          max-width: 70%;
+          position: relative;
+          word-break: break-word;
+          backdrop-filter: blur(8px);
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+        }
+
+        @keyframes floatIn {
+          from { opacity: 0; transform: translateY(10px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .message-incoming {
+          align-self: flex-start;
+          border-left: 4px solid var(--primary);
+        }
+
+        .message-outgoing {
+          align-self: flex-end;
+          background: var(--primary);
+          color: white;
+          border-right: 4px solid var(--secondary);
+        }
+
+        .message-username {
+          font-weight: 600;
+          font-size: 14px;
+          margin-bottom: 4px;
+          animation: fadeIn 0.3s ease-in;
+        }
+
+        .message-text {
+          font-size: 15px;
+          line-height: 1.5;
+        }
+
+        .message-time {
+          font-size: 11px;
+          opacity: 0.7;
+          text-align: right;
+          margin-top: 4px;
+        }
+
+        .input-area {
+          grid-column: 1;
+          display: flex;
+          gap: 10px;
+          margin-top: 20px;
+          animation: fadeIn 0.5s ease;
+        }
+
+        #messageInput {
+          flex: 1;
+          padding: 14px 18px;
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+          border-radius: var(--radius);
+          font-size: 15px;
+          color: var(--light);
+          backdrop-filter: blur(6px);
+          transition: all 0.2s ease-in-out;
+        }
+
+        #messageInput:focus {
+          outline: none;
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3);
+          animation: inputGlow 0.4s forwards;
+        }
+
+        @keyframes inputGlow {
+          from { box-shadow: none; }
+          to { box-shadow: 0 0 12px var(--primary); }
+        }
+
+        #sendButton {
+          background: var(--primary);
+          color: white;
+          border: none;
+          border-radius: var(--radius);
+          padding: 0 24px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        }
+
+        #sendButton:hover {
+          background: var(--secondary);
+          transform: scale(1.05);
+        }
+
+        #userlist {
+          background: var(--glass-bg);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          border: 1px solid var(--glass-border);
+          padding: 20px;
+          height: calc(100vh - 100px);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+          animation: popFade 0.6s ease;
+        }
+        
+        .userlist-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+        }
+        
+        .userlist-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: var(--light);
+        }
+        
+        .user-count {
+          background: var(--primary);
+          color: white;
+          padding: 4px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          box-shadow: 0 0 6px var(--primary);
+        }
+        
+        #users {
+          list-style: none;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          animation: fadeIn 0.5s ease;
+        }
+        
+        #users li {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px;
+          border-radius: var(--radius);
+          transition: all 0.3s ease;
+          background: transparent;
+        }
+        
+        #users li:hover {
+          background: rgba(255, 255, 255, 0.06);
+          transform: scale(1.02);
+        }
+        
+        .user-avatar {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background: var(--primary);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          font-size: 14px;
+          box-shadow: 0 0 10px var(--primary);
+        }
+        
+        .typing-indicator {
+          font-size: 13px;
+          color: var(--gray);
+          font-style: italic;
+          padding: 8px 0;
+          opacity: 0;
+          transition: opacity 0.3s ease;
+        }
+        
+        .typing-indicator.visible {
+          opacity: 1;
+        }
+        
+        .status-dot {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: var(--success);
+          margin-left: auto;
+          box-shadow: 0 0 10px var(--success);
+        }
+        
+        #chatbox::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        #chatbox::-webkit-scrollbar-track {
+          background: transparent;
+          border-radius: 10px;
+        }
+        
+        #chatbox::-webkit-scrollbar-thumb {
+          background: var(--primary);
+          border-radius: 10px;
+        }
+        
+        .profile-modal {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.8);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1000;
+          backdrop-filter: blur(20px);
+        }
+        
+        .message-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 6px;
+        }
+        
+        .message-avatar {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          overflow: hidden;
+          background: var(--glass-bg);
+          border: 1px solid var(--glass-border);
+        }
+        
+        .message-avatar img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          border-radius: 50%;
+        }
+        
+        #serverlist, #channellist {
+          background: var(--glass-bg);
+          border-radius: var(--radius);
+          padding: 15px;
+          width: 80px;
+          border: 1px solid var(--glass-border);
+          backdrop-filter: blur(10px);
+          box-shadow: var(--shadow);
+          animation: popFade 0.4s ease;
+        }
+        
+        #channellist {
+          width: 200px;
+        }
+        
+        @media (max-width: 1200px) {
+          .container {
+            grid-template-columns: 80px 1fr 250px;
+          }
+          #channellist {
+            display: none;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .container {
+            grid-template-columns: 1fr;
+          }
+          #serverlist, #userlist {
+            display: none;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>
+                <svg class="logo" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M8 12H8.01M12 12H12.01M16 12H16.01M21 12C21 16.9706 16.9706 21 12 21C10.2289 21 8.55765 20.5086 7.11797 19.6425L3 21L4.35754 16.882C3.49139 15.4424 3 13.7711 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Nexemy
+            </h1>
+            <div id="connection-status" class="connection-status">
+                <span class="status-dot"></span>
+            </div>
+        </header>
+
+    <aside id="serverlist">
+        <div class="serverlist-header">
+            <span class="serverlist-title">Servers</span>
+            <button id="addServer">+</button>
+        </div>
+        <ul id="servers">
+            <li data-server="global" class="active">Global Chat</li>
+        </ul>
+    </aside>
+
+    <!-- Channel list (middle sidebar) -->
+    <aside id="channellist">
+        <div class="channel-header">
+            <span class="channel-title">Channels</span>
+        </div>
+        <ul id="channels">
+            <li data-channel="general" class="active"># general</li>
+        </ul>
+    </aside>
+
+    <!-- Main chat area -->
+    <main>
+        <div id="chatbox"></div>
+        <div class="typing-indicator" id="typingIndicator"></div>
+        <div class="input-area">
+            <input type="text" id="messageInput" placeholder="Type your message..." autocomplete="off">
+            <button id="sendButton">Send</button>
+        </div>
+    </main>
+
+    <!-- User list (right sidebar) -->
+    <aside id="userlist">
+        <div class="userlist-header">
+            <span class="userlist-title">Online Users</span>
+            <span class="user-count" id="userCount">0</span>
+        </div>
+        <ul id="users"></ul>
+    </aside>
+    <script>
+        // Dark mode by default
+        document.documentElement.style.colorScheme = 'dark';
+        
+        // Get stored credentials
+        const token = localStorage.getItem('chatToken');
+        const username = localStorage.getItem('chatUsername');
+        const urlParams = new URLSearchParams(window.location.search);
+        const currentServerId = urlParams.get('server') || 'global';
+
+                if (!token || !username) {
+                    window.location.href = '/chtlogin';
+                }
+            
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+            
+        const ws = new WebSocket(
+          `${wsProtocol}://${window.location.host}/chatsrvr` +
+          `?token=${encodeURIComponent(token)}` +
+          `&server=${encodeURIComponent(currentServerId)}`
+        );
+            
+                const chatbox = document.getElementById('chatbox');
+                const messageInput = document.getElementById('messageInput');
+                const sendButton = document.getElementById('sendButton');
+                const usersList = document.getElementById('users');
+                const userCount = document.getElementById('userCount');
+                const typingIndicator = document.getElementById('typingIndicator');
+                const editBtn = document.createElement('button');
+                editBtn.textContent = 'Edit Profile';
+                editBtn.style.marginLeft = 'auto';
+                document.querySelector('header').appendChild(editBtn);
+            
+                let typingTimeout;
+            
+                ws.onerror = (error) => {
+                    console.error('Chat connection error:', error);
+                    updateConnectionStatus(false);
+                    addSystemMessage('Connection error - trying to reconnect...');
+                };
+            
+                ws.onclose = () => {
+                    console.log('Chat connection closed');
+                    updateConnectionStatus(false);
+                    setTimeout(() => {
+                        addSystemMessage('Connection lost. Trying to reconnect...');
+                        window.location.reload();
+                    }, 3000);
+                };
+            
+                function addSystemMessage(text) {
+                    const messageElement = document.createElement('div');
+                    messageElement.className = 'message message-incoming';
+                    messageElement.innerHTML = `
+                        <div class="message-username">System</div>
+                        <div class="message-text">${text}</div>
+                        <div class="message-time">${formatTime(new Date().toISOString())}</div>
+                    `;
+                    chatbox.appendChild(messageElement);
+                    chatbox.scrollTop = chatbox.scrollHeight;
+                }
+            
+        function updateUserList(users) {
+          usersList.innerHTML = '';
+          userCount.textContent = users.length;
+        
+          users.forEach(async user => {
+            if (!userProfiles.has(user)) {
+              try {
+                const res = await fetch(`/chatsrvr/profile/${user}`);
+                const json = await res.json();
+                if (json.success) {
+                  userProfiles.set(user, json.profile);
+                } else {
+                  userProfiles.set(user, { displayName: user });
+                }
+              } catch {
+                userProfiles.set(user, { displayName: user });
+              }
+            }
+        
+            const profile = userProfiles.get(user) || { displayName: user };
+            const li = document.createElement('li');
+            const avatar = document.createElement('div');
+            avatar.className = 'user-avatar';
+            avatar.style.backgroundColor = profile.color || '#6c5ce7';
+            avatar.innerHTML = profile.avatar
+              ? `<img src="${profile.avatar}" alt="avatar">`
+              : profile.displayName.charAt(0).toUpperCase();
+        
+            li.appendChild(avatar);
+            li.appendChild(document.createTextNode(profile.displayName));
+            usersList.appendChild(li);
+          });
+        }
+
+        function showTypingIndicator(typingUser) {
+            if (typingUser !== username) {
+                typingIndicator.textContent = `${typingUser} is typing...`;
+                typingIndicator.classList.add('visible');
+                
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                    typingIndicator.classList.remove('visible');
+                }, 3000);
+            }
+        }
+
+        function updateConnectionStatus(connected) {
+            const statusDot = document.querySelector('.status-dot');
+            statusDot.style.background = connected ? 'var(--success)' : 'var(--danger)';
+            statusDot.style.boxShadow = connected ? '0 0 10px var(--success)' : '0 0 10px var(--danger)';
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // Event handlers
+        function sendMessage() {
+            const message = messageInput.value.trim();
+
+            if (message && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'message',
+                    text: message
+                }));
+                messageInput.value = '';
+            }
+        }
+
+        // Update addMessage to show profile info
+        function addMessage(data) {
+            const isCurrentUser = data.username === username;
+            const profile = data.profile || { displayName: data.username };
+
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'message-outgoing' : 'message-incoming'}`;
+
+            messageElement.innerHTML = `
+                <div class="message-header">
+                    <div class="message-avatar" style="background-color: ${profile.color || '#6c5ce7'}">
+                        ${profile.avatar ? 
+                            `<img src="${profile.avatar}" alt="${profile.displayName}">` : 
+                            profile.displayName.charAt(0).toUpperCase()}
+                    </div>
+                    <div class="message-username" style="color: ${profile.color || '#6c5ce7'}">
+                        ${profile.displayName}
+                    </div>
+                </div>
+                <div class="message-text">${data.text}</div>
+                <div class="message-time">${formatTime(data.timestamp)}</div>
+            `;
+            
+            chatbox.appendChild(messageElement);
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
+
+        // Handle all WebSocket messages in one handler
+        ws.onmessage = async (event) => {
+          const data = JSON.parse(event.data);
+        
+          if (data.type === 'message') {
+            if (!userProfiles.has(data.username)) {
+              try {
+                const res = await fetch(`/chatsrvr/profile/${data.username}`);
+                const json = await res.json();
+                if (json.success) {
+                  userProfiles.set(data.username, json.profile);
+                  data.profile = json.profile;
+                }
+              } catch {
+                console.warn('Could not fetch profile for', data.username);
+              }
+            } else {
+              data.profile = userProfiles.get(data.username);
+            }
+            addMessage(data);
+          }
+      
+          if (data.type === 'userlist') {
+            updateUserList(data.users);
+          }
+      
+          if (data.type === 'typing') {
+            showTypingIndicator(data.username);
+          }
+      
+          if (data.type === 'file') {
+            addFileMessage(data);
+          }
+      
+          if (data.type === 'init') {
+            userProfiles.set(data.user.username, data.user.profile);
+          }
+      
+          if (data.type === 'server_update') {
+            // Optional: handle server updates
+          }
+        };
+
+
+        function handleTyping() {
+            if (ws.readyState === WebSocket.OPEN && messageInput.value.trim()) {
+                ws.send(JSON.stringify({
+                    type: 'typing',
+                    username: username
+                }));
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        messageInput.addEventListener('input', () => {
+            handleTyping();
+        });
+
+        // Initialize with empty chat
+        window.addEventListener('DOMContentLoaded', () => {
+            chatbox.innerHTML = '';
+        });
+
+        // Add to chat.html's script section
+        const fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*,video/*';
+        fileInput.style.display = 'none';
+        document.body.appendChild(fileInput);
+
+        const uploadButton = document.createElement('button');
+        uploadButton.innerHTML = '📎';
+        uploadButton.style.background = 'transparent';
+        uploadButton.style.padding = '0 10px';
+        uploadButton.addEventListener('click', () => fileInput.click());
+
+        // Insert before sendButton
+        document.querySelector('.input-area').insertBefore(uploadButton, sendButton);
+
+        fileInput.addEventListener('change', async () => {
+          if (!fileInput.files.length) return;
+        
+          const file = fileInput.files[0];
+          const formData = new FormData();
+          formData.append('file', file);
+        
+          try {
+            const res = await fetch(`/chatsrvr/upload/${currentServerId}`, {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              ws.send(JSON.stringify({
+                type: 'file',
+                url: data.url,
+                fileType: data.type,
+                originalName: file.name
+              }));
+            }
+          } catch (err) {
+            console.error('Upload failed:', err);
+            addSystemMessage('File upload failed');
+          }
+        });
+
+        ws.onopen = async () => {
+          console.log('Chat connection established');
+          updateConnectionStatus(true);
+        
+          try {
+            const res = await fetch(`/chatsrvr/history/${currentServerId}`);
+            const history = await res.json();
+            history.forEach(msg => {
+              if (msg.type === 'file') addFileMessage(msg);
+              else addMessage(msg);
+            });
+          } catch (err) {
+            console.error('Failed to load history:', err);
+          }
+      
+          setTimeout(() => {
+            addSystemMessage(`Welcome to the chat, ${username}!`);
+          }, 500);
+        };
+
+        function addFileMessage(data) {
+          const isCurrentUser = data.username === username;
+          const messageElement = document.createElement('div');
+          messageElement.className = `message ${isCurrentUser ? 'message-outgoing' : 'message-incoming'}`;
+        
+          let content = '';
+          if (data.fileType === 'image') {
+            content = `<img src="${data.url}" alt="${data.originalName}" style="max-width: 100%; max-height: 300px; border-radius: 4px;">`;
+          } else if (data.fileType === 'video') {
+            content = `<video controls src="${data.url}" style="max-width: 100%; max-height: 300px;"></video>`;
+          }
+
+          messageElement.innerHTML = `
+            <div class="message-username">${data.username}</div>
+            <div class="message-text">${content}</div>
+            <div class="message-time">${formatTime(data.timestamp)}</div>
+          `;
+
+          chatbox.appendChild(messageElement);
+          chatbox.scrollTop = chatbox.scrollHeight;
+        }
+        
+        document.querySelector('.input-area').insertBefore(uploadButton, sendButton);
+
+        fileInput.addEventListener('change', async () => {
+          if (!fileInput.files.length) return;
+        
+          const file = fileInput.files[0];
+          const formData = new FormData();
+          formData.append('file', file);
+        
+          try {
+            const res = await fetch(`/chatsrvr/upload/${currentServerId}`, {
+              method: 'POST',
+              body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              ws.send(JSON.stringify({
+                type: 'file',
+                url: data.url,
+                fileType: data.type,
+                originalName: file.name
+              }));
+            }
+          } catch (err) {
+            console.error('Upload failed:', err);
+            addSystemMessage('File upload failed');
+          }
+        });
+
+        const userProfiles = new Map();
+
+        const modal = document.createElement('div');
+        modal.className = 'profile-modal';
+        modal.style.display = 'none';
+        modal.innerHTML = `
+          <div style="background: #2d3436; padding: 20px; border-radius: 8px; width: 300px; display: flex; flex-direction: column; gap: 10px;">
+            <h3 style="margin-bottom: 10px;">Edit Profile</h3>
+            <input type="text" id="editDisplayName" placeholder="Display Name" style="padding: 8px">
+            <input type="text" id="editColor" placeholder="Profile Color (e.g. #6c5ce7)" style="padding: 8px">
+            <textarea id="editBio" placeholder="Bio" style="padding: 8px"></textarea>
+            <button id="saveProfile">Save</button>
+            <button id="cancelProfile">Cancel</button>
+          </div>
+        `;
+        document.body.appendChild(modal);
+      
+        editBtn.addEventListener('click', () => {
+          modal.style.display = 'flex';
+        });
+
+        document.getElementById('cancelProfile').onclick = () => {
+          modal.style.display = 'none';
+        };
+
+        document.getElementById('saveProfile').onclick = async () => {
+          const displayName = document.getElementById('editDisplayName').value;
+          const color = document.getElementById('editColor').value;
+          const bio = document.getElementById('editBio').value;
+        
+        try {
+          const res = await fetch('/chatsrvr/profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token, displayName, bio, color })
+          });
+          const json = await res.json();
+          if (json.success) {
+            modal.style.display = 'none';
+            alert('Profile updated!');
+          } else {
+            console.error('Profile update failed:', json);
+            alert('Failed to update profile.');
+          }
+        } catch (err) {
+          console.error('Network error updating profile:', err);
+          alert('Error updating profile.');
+        }
+        };
+
+    </script>
+</body>
+</html>

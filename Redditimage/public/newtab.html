@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming New Tab</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --accent: #fd79a8;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --danger: #d63031;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .header {
+            margin-bottom: 40px;
+        }
+
+        .time {
+            font-size: 5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .date {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        .search-container {
+            margin-bottom: 50px;
+        }
+
+        .search-box {
+            display: flex;
+            max-width: 600px;
+            margin: 0 auto;
+            border-radius: 50px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            outline: none;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 50px 0 0 50px;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-box button {
+            padding: 0 25px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 0 50px 50px 0;
+        }
+
+        .search-box button:hover {
+            background: var(--accent);
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .game-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: white;
+            transition: transform 0.3s ease;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .game-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .game-card span {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .steam { background-color: #171a21; }
+        .epic { background-color: #2a2a2a; }
+        .twitch { background-color: #9147ff; }
+        .youtube { background-color: #ff0000; }
+        .reddit { background-color: #ff4500; }
+        .news { background-color: #00a8ff; }
+
+        @media (max-width: 768px) {
+            .time {
+                font-size: 3rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .time {
+                font-size: 2.5rem;
+            }
+            
+            .games-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="time" id="time">00:00</h1>
+            <p class="date" id="date">Monday, January 1</p>
+        </div>
+        
+        <div class="search-container">
+            <form action="https://www.google.com/search" method="GET" target="_blank">
+                <div class="search-box">
+                    <input type="text" name="q" placeholder="Search with Google..." autocomplete="off">
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="games-grid">
+            <a href="https://store.steampowered.com" class="game-card" target="_blank">
+                <div class="game-icon steam">
+                    <i class="fab fa-steam"></i>
+                </div>
+                <span>Steam</span>
+            </a>
+            
+            <a href="https://www.epicgames.com" class="game-card" target="_blank">
+                <div class="game-icon epic">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <span>Epic Games</span>
+            </a>
+            
+            <a href="https://www.twitch.tv" class="game-card" target="_blank">
+                <div class="game-icon twitch">
+                    <i class="fab fa-twitch"></i>
+                </div>
+                <span>Twitch</span>
+            </a>
+            
+            <a href="https://www.youtube.com/gaming" class="game-card" target="_blank">
+                <div class="game-icon youtube">
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <span>YouTube Gaming</span>
+            </a>
+            
+            <a href="https://www.reddit.com/r/gaming" class="game-card" target="_blank">
+                <div class="game-icon reddit">
+                    <i class="fab fa-reddit-alien"></i>
+                </div>
+                <span>r/Gaming</span>
+            </a>
+            
+            <a href="https://www.pcgamer.com" class="game-card" target="_blank">
+                <div class="game-icon news">
+                    <i class="far fa-newspaper"></i>
+                </div>
+                <span>Gaming News</span>
+            </a>
+        </div>
+    </div>
+    
+    <script>
+        // Update time and date
+        function updateTime() {
+            const now = new Date();
+            
+            // Format time
+            const timeElement = document.getElementById('time');
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            timeElement.textContent = `${hours}:${minutes}`;
+            
+            // Format date
+            const dateElement = document.getElementById('date');
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Initialize
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        document.querySelector("form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const query = document.querySelector("input[name='q']").value;
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, "_blank");
+});
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const searchInput = document.querySelector('.search-box input');
+            searchInput.focus();
+        });
+    </script>
+</body>
+</html>

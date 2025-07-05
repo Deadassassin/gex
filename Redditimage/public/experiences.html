@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roblox Universe | Experience Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #0f0f13;
+      --bg-card: #1a1a24;
+      --accent: #7d5bff;
+      --accent-hover: #9374ff;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
+      --border-radius: 16px;
+      --box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --success: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image: 
+        radial-gradient(circle at 25% 25%, rgba(109, 69, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 69, 165, 0.15) 0%, transparent 50%);
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 40px 20px;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .header-content {
+      max-width: 600px;
+    }
+    
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      background: linear-gradient(90deg, var(--accent), #b18aff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+    
+    .subtitle {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    .search-filter {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    
+    .search-box {
+      position: relative;
+      min-width: 250px;
+    }
+    
+    .search-box input {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      padding: 12px 20px 12px 45px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      width: 100%;
+      transition: var(--transition);
+    }
+    
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(125, 91, 255, 0.2);
+    }
+    
+    .search-box i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+    
+    .filter-dropdown {
+      position: relative;
+    }
+    
+    .filter-btn {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      padding: 12px 20px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background: var(--bg-card);
+      min-width: 200px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      z-index: 1;
+      padding: 10px 0;
+      margin-top: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dropdown-content.show {
+      display: block;
+    }
+    
+    .dropdown-item {
+      padding: 10px 20px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .dropdown-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .dropdown-item.active {
+      color: var(--accent);
+    }
+    
+    .stats-bar {
+      display: flex;
+      justify-content: space-between;
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      padding: 15px 25px;
+      margin-bottom: 30px;
+      box-shadow: var(--box-shadow);
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .stat-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(125, 91, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+    }
+    
+    .stat-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+    
+    .games-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+    }
+    
+    .game-card {
+      background: var(--bg-card);
+      border-radius: var(--border-radius);
+      overflow: hidden;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeIn 0.5s forwards;
+      animation-delay: calc(var(--delay) * 0.1s);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      position: relative;
+    }
+    
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .game-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 15px 45px rgba(110, 69, 255, 0.25);
+      border-color: rgba(125, 91, 255, 0.3);
+    }
+    
+    .game-badge {
+      position: absolute;
+      top: 15px;
+      left: 15px;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 5px 10px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      z-index: 2;
+    }
+    
+    .game-badge.trending {
+      background: linear-gradient(90deg, #ff3c3c, #ff6b6b);
+    }
+    
+    .game-badge.popular {
+      background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+    }
+    
+    .game-badge.new {
+      background: linear-gradient(90deg, #4caf50, #66bb6a);
+    }
+    
+    .game-thumbnail-container {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      overflow: hidden;
+    }
+    
+    .game-thumbnail {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .game-card:hover .game-thumbnail {
+      transform: scale(1.05);
+    }
+    
+    .game-content {
+      padding: 20px;
+    }
+    
+    .game-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+    
+    .game-name {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      margin-right: 10px;
+    }
+    
+    .game-creator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      margin-top: 5px;
+    }
+    
+    .creator-avatar {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+    
+    .game-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    
+    .stat-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+    
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    
+    .stat-change {
+      font-size: 0.75rem;
+      margin-left: 5px;
+    }
+    
+    .stat-change.positive {
+      color: var(--success);
+    }
+    
+    .stat-change.negative {
+      color: var(--danger);
+    }
+    
+    .game-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .game-tags {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    
+    .game-tag {
+      background: rgba(125, 91, 255, 0.1);
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .updated {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+    
+    .loading, .error {
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .loading {
+      color: var(--text-secondary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .loading-spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid rgba(125, 91, 255, 0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .error {
+      color: var(--danger);
+    }
+    
+    .view-btn {
+      background: rgba(125, 91, 255, 0.1);
+      color: var(--accent);
+      border: none;
+      padding: 8px 15px;
+      border-radius: 50px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.85rem;
+    }
+    
+    .view-btn:hover {
+      background: rgba(125, 91, 255, 0.2);
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 40px;
+      gap: 10px;
+    }
+    
+    .page-btn {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-primary);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .page-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    
+    .page-btn.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-secondary);
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      opacity: 0.5;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 30px 15px;
+      }
+      
+      h1 {
+        font-size: 2.2rem;
+      }
+      
+      .stats-bar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .games-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .theme-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      z-index: 100;
+      transition: var(--transition);
+    }
+    
+    .theme-toggle:hover {
+      background: rgba(255, 255, 255, 0.05);
+      transform: translateY(-3px);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="header-content">
+        <h1>Roblox Universe Dashboard</h1>
+        <p class="subtitle">Explore trending experiences with real-time statistics and analytics</p>
+      </div>
+      <div class="search-filter">
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="searchInput" placeholder="Search experiences...">
+        </div>
+        <div class="filter-dropdown">
+          <button class="filter-btn" id="filterBtn">
+            <i class="fas fa-filter"></i>
+            <span>Filter</span>
+          </button>
+          <div class="dropdown-content" id="filterDropdown">
+            <div class="dropdown-item active" data-filter="all">All Experiences</div>
+            <div class="dropdown-item" data-filter="popular">Popular</div>
+            <div class="dropdown-item" data-filter="trending">Trending</div>
+            <div class="dropdown-item" data-filter="new">New Releases</div>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-users"></i>
+        </div>
+        <div class="stat-text">
+          <span class="stat-label">Total Players</span>
+          <span class="stat-value" id="totalPlayers">0</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-fire"></i>
+        </div>
+        <div class="stat-text">
+          <span class="stat-label">Trending Now</span>
+          <span class="stat-value" id="trendingGames">0</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-star"></i>
+        </div>
+        <div class="stat-text">
+          <span class="stat-label">Top Rated</span>
+          <span class="stat-value" id="topRated">0</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon">
+          <i class="fas fa-arrow-up"></i>
+        </div>
+        <div class="stat-text">
+          <span class="stat-label">Avg. Growth</span>
+          <span class="stat-value" id="avgGrowth">0%</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="games-grid" id="gameContainer"></div>
+    
+    <div class="pagination" id="pagination">
+      <button class="page-btn" id="prevPage"><i class="fas fa-chevron-left"></i></button>
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn" id="nextPage"><i class="fas fa-chevron-right"></i></button>
+    </div>
+  </div>
+
+  <div class="theme-toggle" id="themeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <script>
+    let currentPage = 1;
+    const gamesPerPage = 8;
+    let filteredGames = [];
+    let currentFilter = "all";
+    let allGamesData = [];
+
+    const gameContainer = document.getElementById('gameContainer');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtn = document.getElementById('filterBtn');
+    const filterDropdown = document.getElementById('filterDropdown');
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const totalPlayersEl = document.getElementById('totalPlayers');
+    const trendingGamesEl = document.getElementById('trendingGames');
+    const topRatedEl = document.getElementById('topRated');
+    const avgGrowthEl = document.getElementById('avgGrowth');
+    const themeToggle = document.getElementById('themeToggle');
+
+    async function init() {
+      try {
+        gameContainer.innerHTML = `
+          <div class="empty-state">
+            <div class="loading-spinner"></div>
+            <p>Loading game data...</p>
+          </div>
+        `;
+
+        const response = await fetch('/api/roblox/games/all');
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          allGamesData = data.games;
+          
+          filteredGames = [...allGamesData];
+          
+          updateStats(data.stats);
+          
+          renderGames();
+        } else {
+          throw new Error(data.error || 'Failed to load game data');
+        }
+      } catch (error) {
+        console.error('Failed to initialize:', error);
+        showError('Failed to load game data. Please try again later.');
+      }
+      
+      setupEventListeners();
+    }
+
+    function updateStats(stats) {
+      if (!stats) return;
+      
+      totalPlayersEl.textContent = stats.totalPlayers?.toLocaleString() || '0';
+      trendingGamesEl.textContent = stats.trendingCount?.toLocaleString() || '0';
+      topRatedEl.textContent = stats.popularCount?.toLocaleString() || '0';
+      avgGrowthEl.textContent = stats.avgGrowth ? `${stats.avgGrowth}%` : '0%';
+    }
+
+    function setupEventListeners() {
+      searchInput.addEventListener('input', () => {
+        currentPage = 1;
+        filterGames();
+        renderGames();
+      });
+
+      filterBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        filterDropdown.classList.toggle('show');
+      });
+
+      document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.dropdown-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          currentFilter = item.dataset.filter;
+          currentPage = 1;
+          filterGames();
+          renderGames();
+          filterDropdown.classList.remove('show');
+        });
+      });
+
+      document.addEventListener('click', () => {
+        filterDropdown.classList.remove('show');
+      });
+
+      prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderGames();
+        }
+      });
+
+      nextPageBtn.addEventListener('click', () => {
+        if (currentPage < Math.ceil(filteredGames.length / gamesPerPage)) {
+          currentPage++;
+          renderGames();
+        }
+      });
+
+      themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    function filterGames() {
+      const searchTerm = searchInput.value.toLowerCase();
+      
+      filteredGames = allGamesData.filter(game => {
+        const name = game.name?.toLowerCase() || '';
+        const creator = game.creator?.toLowerCase() || '';
+        const tags = game.tags || [];
+        
+        const matchesSearch = name.includes(searchTerm) || 
+                             creator.includes(searchTerm) ||
+                             tags.some(tag => tag.toLowerCase().includes(searchTerm));
+        
+        let matchesFilter = true;
+        if (currentFilter === "popular") {
+          matchesFilter = game.badge === "popular";
+        } else if (currentFilter === "trending") {
+          matchesFilter = game.badge === "trending";
+        } else if (currentFilter === "new") {
+          matchesFilter = game.badge === "new";
+        }
+        
+        return matchesSearch && matchesFilter;
+      });
+    }
+
+    function renderGames() {
+      gameContainer.innerHTML = '';
+      
+      if (filteredGames.length === 0) {
+        gameContainer.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-gamepad"></i>
+            <h3>No experiences found</h3>
+            <p>Try adjusting your search or filter criteria</p>
+          </div>
+        `;
+        updatePagination();
+        return;
+      }
+      
+      const startIdx = (currentPage - 1) * gamesPerPage;
+      const endIdx = startIdx + gamesPerPage;
+      const gamesToRender = filteredGames.slice(startIdx, endIdx);
+      
+      gamesToRender.forEach((game, i) => {
+        gameContainer.appendChild(createCard(game, i));
+      });
+      
+      updatePagination();
+    }
+
+    function createCard(game, delay) {
+      const card = document.createElement('div');
+      card.className = 'game-card';
+      card.style.setProperty('--delay', delay);
+
+      const name = game.name || `Place ${game.placeId}`;
+      const playing = game.playing ? game.playing.toLocaleString() : '0';
+      const visits = game.visits ? game.visits.toLocaleString() : '0';
+      const favoritedCount = game.favoritedCount ? game.favoritedCount.toLocaleString() : '0';
+      const thumbnailUrl = game.thumbnailUrl || 'https://via.placeholder.com/512x288/1a1a24/999999?text=No+Thumbnail';
+      const creatorName = game.creator || 'Unknown Creator';
+      const creatorAvatar = game.creatorAvatar || 'https://via.placeholder.com/150/1a1a24/999999?text=Creator';
+      const tags = game.tags || [];
+      const badge = game.badge || null;
+      const change = game.change || 0;
+      const updated = game.updated ? new Date(game.updated).toLocaleTimeString() : 'Just now';
+
+      let badgeHtml = '';
+      if (badge) {
+        badgeHtml = `<div class="game-badge ${badge}">
+          <i class="fas fa-${badge === 'trending' ? 'fire' : 
+                            badge === 'popular' ? 'star' : 
+                            'rocket'}"></i>
+          ${badge === 'trending' ? 'Trending' : 
+            badge === 'popular' ? 'Popular' : 'New'}
+        </div>`;
+      }
+
+      const tagsHtml = tags.map(tag => 
+        `<span class="game-tag">${tag}</span>`
+      ).join('');
+
+      const changeClass = change >= 0 ? 'positive' : 'negative';
+      const changeIcon = change >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+      const changeHtml = change ? 
+        `<span class="stat-change ${changeClass}">
+          <i class="fas ${changeIcon}"></i> ${Math.abs(change)}%
+        </span>` : '';
+
+      card.innerHTML = `
+        ${badgeHtml}
+        <div class="game-thumbnail-container">
+          <img src="${thumbnailUrl}" class="game-thumbnail" 
+               onerror="this.src='https://via.placeholder.com/512x288/1a1a24/999999?text=No+Thumbnail'" 
+               alt="${name} thumbnail">
+        </div>
+        <div class="game-content">
+          <div class="game-header">
+            <div>
+              <div class="game-name">${name}</div>
+              <div class="game-creator">
+                <img src="${creatorAvatar}" class="creator-avatar" alt="${creatorName}">
+                ${creatorName}
+              </div>
+            </div>
+            <button class="view-btn" onclick="event.stopPropagation();window.open('https://www.roblox.com/games/${game.placeId}', '_blank')">
+              <i class="fas fa-external-link-alt"></i> View
+            </button>
+          </div>
+          <div class="game-stats">
+            <div class="stat">
+              <span class="stat-label">
+                <i class="fas fa-users"></i>
+                Players
+              </span>
+              <span class="stat-value">${playing} ${changeHtml}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">
+                <i class="fas fa-eye"></i>
+                Visits
+              </span>
+              <span class="stat-value">${visits}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">
+                <i class="fas fa-heart"></i>
+                Likes
+              </span>
+              <span class="stat-value">${favoritedCount}</span>
+            </div>
+            <div class="stat">
+              <span class="stat-label">
+                <i class="fas fa-chart-line"></i>
+                Growth
+              </span>
+              <span class="stat-value">${change >= 0 ? '+' : ''}${change}%</span>
+            </div>
+          </div>
+          <div class="game-footer">
+            <div class="game-tags">
+              ${tagsHtml}
+            </div>
+            <div class="updated">Updated: ${updated}</div>
+          </div>
+        </div>
+      `;
+
+      card.onclick = () => window.open(`https://www.roblox.com/games/${game.placeId}`, '_blank');
+      return card;
+    }
+
+    function updatePagination() {
+      const totalPages = Math.ceil(filteredGames.length / gamesPerPage);
+      const paginationContainer = document.getElementById('pagination');
+      
+      paginationContainer.innerHTML = '';
+      paginationContainer.appendChild(prevPageBtn);
+      
+      const startPage = Math.max(1, currentPage - 1);
+      const endPage = Math.min(totalPages, currentPage + 1);
+      
+      if (startPage > 1) {
+        const firstBtn = document.createElement('button');
+        firstBtn.className = 'page-btn';
+        firstBtn.textContent = '1';
+        firstBtn.addEventListener('click', () => {
+          currentPage = 1;
+          renderGames();
+        });
+        paginationContainer.appendChild(firstBtn);
+        
+        if (startPage > 2) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'page-btn disabled';
+          ellipsis.textContent = '...';
+          paginationContainer.appendChild(ellipsis);
+        }
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        const pageBtn = document.createElement('button');
+        pageBtn.className = `page-btn ${i === currentPage ? 'active' : ''}`;
+        pageBtn.textContent = i;
+        pageBtn.addEventListener('click', () => {
+          currentPage = i;
+          renderGames();
+        });
+        paginationContainer.appendChild(pageBtn);
+      }
+      
+      if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+          const ellipsis = document.createElement('span');
+          ellipsis.className = 'page-btn disabled';
+          ellipsis.textContent = '...';
+          paginationContainer.appendChild(ellipsis);
+        }
+        
+        const lastBtn = document.createElement('button');
+        lastBtn.className = 'page-btn';
+        lastBtn.textContent = totalPages;
+        lastBtn.addEventListener('click', () => {
+          currentPage = totalPages;
+          renderGames();
+        });
+        paginationContainer.appendChild(lastBtn);
+      }
+      
+      paginationContainer.appendChild(nextPageBtn);
+      
+      prevPageBtn.disabled = currentPage === 1;
+      nextPageBtn.disabled = currentPage === totalPages || totalPages === 0;
+      
+      if (prevPageBtn.disabled) {
+        prevPageBtn.classList.add('disabled');
+      } else {
+        prevPageBtn.classList.remove('disabled');
+      }
+      
+      if (nextPageBtn.disabled) {
+        nextPageBtn.classList.add('disabled');
+      } else {
+        nextPageBtn.classList.remove('disabled');
+      }
+    }
+
+    function showError(message) {
+      gameContainer.innerHTML = `
+        <div class="empty-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>${message}</h3>
+          <p>Please try again later</p>
+        </div>
+      `;
+    }
+
+    function toggleTheme() {
+      const icon = themeToggle.querySelector('i');
+      if (icon.classList.contains('fa-moon')) {
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+        document.body.classList.add('light-theme');
+      } else {
+        icon.classList.remove('fa-sun');
+        icon.classList.add('fa-moon');
+        document.body.classList.remove('light-theme');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

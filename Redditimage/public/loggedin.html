@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reddit Media Explorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #4f2ad3d2;
+      --primary-hover: #1b007a;
+      --primary-light: rgba(110, 68, 255, 0.15);
+      --secondary: #00e5ff;
+      --background: #121212;
+      --surface: rgba(30, 30, 30, 0.5);
+      --surface-hover: rgba(50, 50, 50, 0.85);
+      --surface-light: rgba(255, 255, 255, 0.08);
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --border: rgba(255, 255, 255, 0.12);
+      --border-light: rgba(255, 255, 255, 0.2);
+      --success: #00fa08;
+      --error: #d10000;
+      --warning: #ffab00;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --radius-xl: 16px;
+      --shadow-sm: 0 1px 6px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.5);
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      --sidebar-width: 450px;
+      --glass-blur: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--background);
+      color: var(--text-primary);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(110, 68, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 85% 85%, rgba(0, 229, 255, 0.15) 0%, transparent 50%);
+    }
+
+    header {
+      background-color: var(--surface);
+      padding: 16px;
+      box-shadow: var(--shadow-md);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .sidebar-toggle {
+      background: var(--surface-light);
+      border: none;
+      color: var(--text-primary);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+    }
+
+    .sidebar-toggle:hover {
+      background-color: var(--surface-hover);
+      transform: translateY(-1px);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-right: auto;
+    }
+
+    .logo i {
+      color: var(--primary);
+      font-size: 1.5rem;
+    }
+
+    .search-container {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      max-width: 600px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      background-color: rgba(30, 30, 30, 0.5);
+      color: var(--text-primary);
+      font-size: 1rem;
+      transition: var(--transition);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px var(--primary-light);
+    }
+
+    button {
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      border: none;
+      background-color: var(--primary);
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      background-color: var(--border);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+      opacity: 0.7;
+    }
+
+    .button-secondary {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .button-secondary:hover {
+      background-color: var(--surface-hover);
+      border-color: var(--border-light);
+    }
+
+    .button-accent {
+      background-color: var(--secondary);
+      color: #121212;
+    }
+
+    .button-accent:hover {
+      background-color: #00c4e0;
+    }
+
+    .main-container {
+      flex: 1;
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      position: relative;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+      align-content: start;
+    }
+
+    .card {
+      background-color: var(--surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: var(--transition);
+      cursor: pointer;
+      position: relative;
+      aspect-ratio: 1;
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .card:hover {
+      transform: translateY(-8px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--primary);
+    }
+
+    .card-media {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-media {
+      transform: scale(1.03);
+    }
+
+    .card-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 24px;
+      background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+      color: white;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-meta {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-actions {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .card:hover .card-actions {
+      opacity: 1;
+    }
+
+    .card-action-btn {
+      background-color: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .card-action-btn:hover {
+      background-color: var(--primary);
+      transform: scale(1.3);
+    }
+
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.95);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      position: relative;
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      padding: 32px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .modal-media-container {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      margin-bottom: 24px;
+      position: relative;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-media {
+      max-width: 100%;
+      max-height: 80vh;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(0, 0, 0, 0.7);
+      border: none;
+      color: white;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      cursor: pointer;
+      transition: var(--transition);
+      z-index: 2;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .modal-close:hover {
+      background-color: var(--error);
+      transform: rotate(90deg);
+    }
+
+    .modal-info {
+      color: white;
+      max-height: 20vh;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .modal-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      padding-right: 8px;
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .loading {
+      display: flex;
+      justify-content: center;
+      padding: 48px;
+    }
+
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 8px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50px;
+      border-top-color: var(--primary);
+      animation: spin .5s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 48px;
+      text-align: center;
+      color: var(--text-secondary);
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .empty-state i {
+      font-size: 3rem;
+      color: var(--primary);
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .auth-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      padding: 48px;
+      text-align: center;
+      background-color: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .auth-message {
+      max-width: 500px;
+      margin-bottom: 24px;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    .auth-button {
+      background-color: var(--primary);
+      color: white;
+      padding: 16px 32px;
+      border-radius: var(--radius-md);
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: var(--transition);
+      font-size: 1.1rem;
+    }
+
+    .auth-button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background-color: var(--surface);
+      z-index: 1000;
+      transition: var(--transition);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .sidebar.active {
+      left: 0;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .sidebar-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.5rem;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .sidebar-close:hover {
+      background-color: var(--surface-hover);
+    }
+
+    .sidebar-content {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .sidebar-item {
+      background-color: var(--surface-hover);
+      padding: 16px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+    }
+
+    .sidebar-item:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    .sidebar-item-title {
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .sidebar-item-meta {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 8px;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: var(--transition);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--surface);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1100;
+      opacity: 0;
+      transition: var(--transition);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .toast.active {
+      opacity: 1;
+    }
+
+    .toast.success {
+      border-left: 4px solid var(--success);
+    }
+
+    .toast.error {
+      border-left: 4px solid var(--error);
+    }
+
+    .toast.warning {
+      border-left: 4px solid var(--warning);
+    }
+
+    .nsfw-tag {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background-color: var(--error);
+      text-align: center;
+      width: 15%;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      z-index: 1;
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .nsfw-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 24px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: var(--surface-hover);
+      transition: var(--transition);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 4px;
+      bottom: 3px;
+      background-color: var(--text-secondary);
+      transition: var(--transition);
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+      background-color: white;
+    }
+
+    .compatibility-error {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .compatibility-error h2 {
+      color: var(--error);
+      margin-bottom: 16px;
+    }
+
+    .compatibility-error p {
+      margin-bottom: 8px;
+      max-width: 600px;
+    }
+
+    .compatibility-error code {
+      background-color: rgba(255, 255, 255, 0.1);
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      margin: 8px 0;
+      display: block;
+      font-family: monospace;
+    }
+
+    .compatibility-error button {
+      margin-top: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .header-container {
+        flex-wrap: wrap;
+      }
+
+      .search-container {
+        order: 3;
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      .grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      }
+
+      :root {
+        --sidebar-width: 280px;
+      }
+
+      .modal-content {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .modal-actions {
+        flex-direction: column;
+      }
+
+      button {
+        padding: 12px 16px;
+      }
+
+      .main-container {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay" id="overlay"></div>
+  
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-title">Saved Posts</div>
+      <button class="sidebar-close" id="sidebarClose">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="sidebar-content" id="sidebarContent">
+    </div>
+  </div>
+
+  <header>
+    <div class="header-container">
+      <button class="sidebar-toggle" id="sidebarToggle">
+        <i class="fas fa-bookmark"></i>
+      </button>
+      <div class="logo">
+        <i class="fab fa-reddit"></i>
+        <span>Reddit Media Explorer</span>
+      </div>
+      <div class="search-container">
+        <input type="text" id="subredditInput" placeholder="Enter subreddit (e.g. pics, aww, earthporn)" value="pics">
+        <button id="loadBtn">
+          <i class="fas fa-search"></i>
+          <span class="desktop-text">Load</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div id="authView" class="auth-container" style="display: none;">
+      <i class="fas fa-key"></i>
+      <h2>Authentication Required</h2>
+      <p class="auth-message">To view Reddit content, you need to authenticate with your Reddit account. This allows us to fetch content through Reddit's API.</p>
+      <a href="#" id="authButton" class="auth-button">
+        <i class="fab fa-reddit"></i>
+        Connect with Reddit
+      </a>
+    </div>
+
+    <div id="contentView" style="display: none;">
+      <div class="nsfw-toggle" id="nsfwToggleContainer" style="display: none;">
+        <label class="toggle-switch">
+          <input type="checkbox" id="nsfwToggle">
+          <span class="slider"></span>
+        </label>
+        <span>Show NSFW Content</span>
+      </div>
+      <div id="gridView" class="grid"></div>
+      <div id="loadingView" class="loading" style="display: none;">
+        <div class="spinner"></div>
+      </div>
+      <div id="emptyView" class="empty-state" style="display: none;">
+        <i class="fas fa-image"></i>
+        <h3>No media found</h3>
+        <p>Try a different subreddit, checking your network connection, or check with compatibility.</p>
+      </div>
+    </div>
+  </main>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose">
+        <i class="fas fa-times"></i>
+      </button>
+      <div class="modal-media-container">
+        <div id="modalMedia"></div>
+      </div>
+      <div class="modal-info">
+        <h3 id="modalTitle"></h3>
+        <div class="card-meta">
+          <span id="modalAuthor"></span>
+          <span>•</span>
+          <span id="modalScore"></span>
+          <i class="fas fa-arrow-up"></i>
+          <span>•</span>
+          <span id="modalComments"></span>
+          <i class="fas fa-comment"></i>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button id="downloadBtn" class="button-accent">
+          <i class="fas fa-download"></i>
+          Download
+        </button>
+        <button id="saveBtn" class="button-secondary">
+          <i class="fas fa-bookmark"></i>
+          Save
+        </button>
+        <a href="#" target="_blank" id="redditLink" class="button-secondary">
+          <i class="fab fa-reddit"></i>
+          View on Reddit
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script>
+    const elements = {
+      subredditInput: document.getElementById('subredditInput'),
+      loadBtn: document.getElementById('loadBtn'),
+      gridView: document.getElementById('gridView'),
+      loadingView: document.getElementById('loadingView'),
+      emptyView: document.getElementById('emptyView'),
+      authView: document.getElementById('authView'),
+      contentView: document.getElementById('contentView'),
+      authButton: document.getElementById('authButton'),
+      modal: document.getElementById('modal'),
+      modalClose: document.getElementById('modalClose'),
+      modalMedia: document.getElementById('modalMedia'),
+      modalTitle: document.getElementById('modalTitle'),
+      modalAuthor: document.getElementById('modalAuthor'),
+      modalScore: document.getElementById('modalScore'),
+      modalComments: document.getElementById('modalComments'),
+      downloadBtn: document.getElementById('downloadBtn'),
+      saveBtn: document.getElementById('saveBtn'),
+      redditLink: document.getElementById('redditLink'),
+      sidebar: document.getElementById('sidebar'),
+      sidebarToggle: document.getElementById('sidebarToggle'),
+      sidebarClose: document.getElementById('sidebarClose'),
+      sidebarContent: document.getElementById('sidebarContent'),
+      overlay: document.getElementById('overlay'),
+      toast: document.getElementById('toast'),
+      nsfwToggle: document.getElementById('nsfwToggle'),
+      nsfwToggleContainer: document.getElementById('nsfwToggleContainer')
+    };
+
+    const state = {
+      token: null,
+      subreddit: 'pics',
+      allPosts: [],
+      nsfwPosts: [],
+      displayedPosts: [],
+      after: null,
+      nsfwAfter: null,
+      isLoading: false,
+      hasMore: true,
+      hasMoreNSFW: true,
+      currentPostIndex: 0,
+      savedPosts: JSON.parse(localStorage.getItem('savedPosts')) || [],
+      currentModalPost: null,
+      showNSFW: false,
+      compatibilityError: null,
+      hasMediaPosts: false
+    };
+
+    const CLIENT_ID = 'dZozLujKeYD0x_7oXOyjAQ';
+    const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
+    const SCOPES = 'read save identity';
+    const POSTS_PER_LOAD = 20;
+    const MAX_POSTS_TO_KEEP = 200;
+    const SERVER_ENDPOINT = 'https://your-server.com/log-compatibility'; // Replace with your server endpoint
+
+    function init() {
+      checkCompatibility();
+      if (state.compatibilityError) {
+        showCompatibilityError();
+        return;
+      }
+      
+      setupEventListeners();
+      checkAuth();
+      renderSavedPosts();
+    }
+
+    function checkCompatibility() {
+      const userAgent = navigator.userAgent;
+      const isIOS = /iPad|iPhone|iPod/.test(userAgent);
+      const isFirefox = userAgent.includes('Firefox');
+      
+      // Check for critical features
+      try {
+        if (typeof IntersectionObserver === 'undefined') {
+          throw new Error('IntersectionObserver not supported');
+        }
+        
+        if (typeof localStorage === 'undefined') {
+          throw new Error('localStorage not supported');
+        }
+        
+        // Check for backdrop-filter support
+        const testElement = document.createElement('div');
+        testElement.style.backdropFilter = 'blur(5px)';
+        if (!testElement.style.backdropFilter && !testElement.style.webkitBackdropFilter) {
+          throw new Error('CSS backdrop-filter not supported');
+        }
+        
+        // Check for HLS.js support
+        if (isIOS && !document.createElement('video').canPlayType('application/vnd.apple.mpegurl')) {
+          throw new Error('HLS video playback not supported on this iOS device');
+        }
+        
+      } catch (error) {
+        state.compatibilityError = {
+          message: error.message,
+          userAgent: userAgent,
+          platform: navigator.platform,
+          browser: detectBrowser()
+        };
+        logCompatibilityError();
+      }
+    }
+    
+    function detectBrowser() {
+      const userAgent = navigator.userAgent;
+      if (userAgent.includes('Chrome')) return 'Chrome';
+      if (userAgent.includes('Safari')) return 'Safari';
+      if (userAgent.includes('Firefox')) return 'Firefox';
+      if (userAgent.includes('Edge')) return 'Edge';
+      if (userAgent.includes('Opera')) return 'Opera';
+      return 'Unknown';
+    }
+    
+    function logCompatibilityError() {
+      // In a real app, you would send this to your server
+      console.error('Compatibility error:', state.compatibilityError);
+      
+      // Here's how you would send it to a server
+      /*
+      fetch(SERVER_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          error: state.compatibilityError.message,
+          userAgent: state.compatibilityError.userAgent,
+          platform: state.compatibilityError.platform,
+          browser: state.compatibilityError.browser,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(err => console.error('Error logging compatibility issue:', err));
+      */
+    }
+    
+    function showCompatibilityError() {
+      document.body.innerHTML = `
+        <div class="compatibility-error">
+          <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--error); margin-bottom: 24px;"></i>
+          <h2>Compatibility Error</h2>
+          <p>Sorry, this app doesn't work properly on your device/browser due to the following reason:</p>
+          <code>${state.compatibilityError.message}</code>
+          <p>Device: ${state.compatibilityError.platform}</p>
+          <p>Browser: ${state.compatibilityError.browser}</p>
+          <p>This error has been logged to our servers.</p>
+          <button onclick="window.location.reload()" class="button-accent">
+            <i class="fas fa-sync-alt"></i>
+            Try Again
+          </button>
+        </div>
+      `;
+    }
+
+    function setupEventListeners() {
+      elements.loadBtn.addEventListener('click', loadContent);
+      elements.subredditInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') loadContent();
+      });
+      elements.modalClose.addEventListener('click', closeModal);
+      elements.authButton.addEventListener('click', redirectToRedditAuth);
+      elements.downloadBtn.addEventListener('click', downloadMedia);
+      elements.saveBtn.addEventListener('click', saveCurrentPost);
+      elements.sidebarToggle.addEventListener('click', toggleSidebar);
+      elements.sidebarClose.addEventListener('click', toggleSidebar);
+      elements.overlay.addEventListener('click', toggleSidebar);
+      elements.nsfwToggle.addEventListener('change', toggleNSFWContent);
+      
+      const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !state.isLoading && state.hasMore) {
+          loadMoreContent();
+        }
+      }, { threshold: 0.1 });
+
+      const sentinel = document.createElement('div');
+      sentinel.id = 'sentinel';
+      document.body.appendChild(sentinel);
+      observer.observe(sentinel);
+    }
+
+    function checkAuth() {
+      state.token = extractTokenFromHash();
+      
+      if (state.token) {
+        showContentView();
+        loadContent();
+      } else {
+        showAuthView();
+      }
+    }
+
+    function extractTokenFromHash() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get('access_token');
+    }
+
+    function redirectToRedditAuth(e) {
+      e.preventDefault();
+      const state = Math.random().toString(36).substring(2);
+      const authUrl = `https://www.reddit.com/api/v1/authorize?client_id=${CLIENT_ID}&response_type=token&state=${state}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&duration=temporary&scope=${SCOPES}`;
+      window.location.href = authUrl;
+    }
+
+    function showAuthView() {
+      elements.authView.style.display = 'flex';
+      elements.contentView.style.display = 'none';
+    }
+
+    function showContentView() {
+      elements.authView.style.display = 'none';
+      elements.contentView.style.display = 'block';
+    }
+
+    function showLoading(show) {
+      elements.loadingView.style.display = show ? 'flex' : 'none';
+      elements.loadBtn.disabled = show;
+    }
+
+    function showEmptyState(show) {
+      elements.emptyView.style.display = show ? 'flex' : 'none';
+    }
+
+    function showToast(message, type = 'success') {
+      elements.toast.textContent = message;
+      elements.toast.className = `toast ${type}`;
+      elements.toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'exclamation-triangle'}"></i>
+        ${message}
+      `;
+      elements.toast.classList.add('active');
+      
+      setTimeout(() => {
+        elements.toast.classList.remove('active');
+      }, 3000);
+    }
+
+    function toggleSidebar() {
+      elements.sidebar.classList.toggle('active');
+      elements.overlay.classList.toggle('active');
+      document.body.style.overflow = elements.sidebar.classList.contains('active') ? 'hidden' : '';
+    }
+
+    function toggleNSFWContent() {
+      state.showNSFW = elements.nsfwToggle.checked;
+      state.displayedPosts = [];
+      state.currentPostIndex = 0;
+      elements.gridView.innerHTML = '';
+      renderNextPosts();
+    }
+
+    function loadContent() {
+      state.subreddit = elements.subredditInput.value.trim() || 'pics';
+      state.allPosts = [];
+      state.nsfwPosts = [];
+      state.displayedPosts = [];
+      state.after = null;
+      state.nsfwAfter = null;
+      state.hasMore = true;
+      state.hasMoreNSFW = true;
+      state.currentPostIndex = 0;
+      state.showNSFW = false;
+      state.hasMediaPosts = false;
+      elements.nsfwToggle.checked = false;
+      elements.gridView.innerHTML = '';
+      showEmptyState(false);
+      loadMoreContent();
+    }
+
+    async function loadMoreContent() {
+      if (state.isLoading || !state.hasMore) return;
+      
+      state.isLoading = true;
+      showLoading(true);
+
+      try {
+        // Always fetch regular content first
+        if (state.currentPostIndex >= state.allPosts.length - 5 && state.hasMore) {
+          const url = `https://oauth.reddit.com/r/${state.subreddit}/.json?limit=100&raw_json=1${state.after ? `&after=${state.after}` : ''}`;
+          
+          const response = await fetch(url, {
+            headers: {
+              'Authorization': `bearer ${state.token}`,
+              'User-Agent': 'web:RedditMediaExplorer:v1.0'
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`API request failed: ${response.status}`);
+          }
+
+          const data = await response.json();
+          const newPosts = data.data.children.filter(post => !state.allPosts.some(p => p.data.id === post.data.id));
+          
+          // Separate NSFW posts
+          const { nsfwPosts, regularPosts } = separateNSFWPosts(newPosts);
+          
+          state.allPosts = [...state.allPosts, ...regularPosts];
+          state.nsfwPosts = [...state.nsfwPosts, ...nsfwPosts];
+          state.after = data.data.after;
+          state.hasMore = !!state.after;
+          
+          if (state.allPosts.length > MAX_POSTS_TO_KEEP) {
+            state.allPosts = state.allPosts.slice(-MAX_POSTS_TO_KEEP);
+          }
+          
+          // Show NSFW toggle if we found any NSFW content
+          if (state.nsfwPosts.length > 0) {
+            elements.nsfwToggleContainer.style.display = 'flex';
+          }
+        }
+
+        renderNextPosts();
+
+      } catch (error) {
+        console.error('Error loading content:', error);
+        if (!state.hasMediaPosts) {
+          showEmptyState(true);
+        }
+        showToast('Failed to load content. Please try again.', 'error');
+      } finally {
+        state.isLoading = false;
+        showLoading(false);
+      }
+    }
+    
+    function separateNSFWPosts(posts) {
+      const nsfwPosts = [];
+      const regularPosts = [];
+      
+      posts.forEach(post => {
+        if (post.data.over_18) {
+          nsfwPosts.push(post);
+        } else {
+          regularPosts.push(post);
+        }
+      });
+      
+      return { nsfwPosts, regularPosts };
+    }
+
+    function renderNextPosts() {
+      // Determine which posts to show based on NSFW toggle
+      const postsToShow = state.showNSFW 
+        ? [...state.allPosts, ...state.nsfwPosts] 
+        : state.allPosts;
+      
+      const postsToRender = postsToShow.slice(state.currentPostIndex, state.currentPostIndex + POSTS_PER_LOAD);
+      
+      const mediaPosts = postsToRender.filter(post => {
+        const data = post.data;
+        return (
+          (data.url_overridden_by_dest?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ||
+          (data.is_video && data.media?.reddit_video?.hls_url) ||
+          data.post_hint === 'image' ||
+          data.post_hint === 'hosted:video' ||
+          (data.preview && data.preview.images && data.preview.images.length > 0) ||
+          (data.is_gallery && data.media_metadata) ||
+          (data.media && data.media.reddit_video)
+        ));
+      });
+
+      if (mediaPosts.length === 0 && state.displayedPosts.length === 0 && !state.hasMediaPosts) {
+        showEmptyState(true);
+        return;
+      }
+
+      if (mediaPosts.length > 0) {
+        state.hasMediaPosts = true;
+        showEmptyState(false);
+      }
+
+      state.displayedPosts = [...state.displayedPosts, ...mediaPosts];
+      state.currentPostIndex += POSTS_PER_LOAD;
+
+      mediaPosts.forEach(post => {
+        const data = post.data;
+        const card = document.createElement('div');
+        card.className = 'card';
+        
+        const isSaved = state.savedPosts.some(p => p.id === data.id);
+        
+        if (data.over_18) {
+          const nsfwTag = document.createElement('div');
+          nsfwTag.className = 'nsfw-tag';
+          nsfwTag.textContent = 'NSFW';
+          card.appendChild(nsfwTag);
+        }
+
+        if (data.is_gallery && data.media_metadata) {
+          const firstImageId = data.gallery_data.items[0].media_id;
+          const firstImage = data.media_metadata[firstImageId];
+          if (firstImage) {
+            const img = document.createElement('img');
+            img.className = 'card-media';
+            img.loading = 'lazy';
+            img.src = firstImage.s.u || firstImage.p[0]?.u || data.thumbnail;
+            img.alt = data.title;
+            card.appendChild(img);
+          }
+        } else if (data.url_overridden_by_dest?.match(/\.(jpg|jpeg|png|gif|webp)$/i) || data.post_hint === 'image') {
+          const img = document.createElement('img');
+          img.className = 'card-media';
+          img.loading = 'lazy';
+          img.src = data.preview?.images?.[0]?.resolutions?.[2]?.url?.replace(/&amp;/g, '&') || 
+                   data.thumbnail || 
+                   data.url_overridden_by_dest;
+          img.alt = data.title;
+          card.appendChild(img);
+        } else if (data.is_video && data.media?.reddit_video?.hls_url) {
+          const video = document.createElement('video');
+          video.className = 'card-media';
+          video.poster = data.thumbnail;
+          video.muted = true;
+          video.loop = true;
+          video.autoplay = true;
+          
+          if (Hls.isSupported()) {
+            const hls = new Hls();
+            hls.loadSource(data.media.reddit_video.hls_url);
+            hls.attachMedia(video);
+          } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+            video.src = data.media.reddit_video.hls_url;
+          }
+          
+          card.appendChild(video);
+        } else if (data.url_overridden_by_dest?.match(/\.(mp4|gifv)$/i)) {
+          const video = document.createElement('video');
+          video.className = 'card-media';
+          video.muted = true;
+          video.loop = true;
+          video.autoplay = true;
+          video.src = data.url_overridden_by_dest.replace('.gifv', '.mp4');
+          card.appendChild(video);
+        } else if (data.preview?.images?.[0]?.source?.url) {
+          const img = document.createElement('img');
+          img.className = 'card-media';
+          img.loading = 'lazy';
+          img.src = data.preview.images[0].source.url.replace(/&amp;/g, '&');
+          img.alt = data.title;
+          card.appendChild(img);
+        }
+
+        const overlay = document.createElement('div');
+        overlay.className = 'card-overlay';
+        overlay.innerHTML = `
+          <h3 class="card-title">${data.title}</h3>
+          <div class="card-meta">
+            <span>u/${data.author}</span>
+            <span>•</span>
+            <span>${data.score.toLocaleString()}</span>
+            <i class="fas fa-arrow-up"></i>
+          </div>
+        `;
+        card.appendChild(overlay);
+
+        const actions = document.createElement('div');
+        actions.className = 'card-actions';
+        actions.innerHTML = `
+          <button class="card-action-btn" data-id="${data.id}" data-action="save">
+            <i class="fas ${isSaved ? 'fa-bookmark' : 'fa-bookmark'}"></i>
+          </button>
+          <button class="card-action-btn" data-id="${data.id}" data-action="download">
+            <i class="fas fa-download"></i>
+          </button>
+        `;
+        card.appendChild(actions);
+
+        actions.querySelector('[data-action="save"]').addEventListener('click', (e) => {
+          e.stopPropagation(); 
+          savePost(data);
+        });
+
+        actions.querySelector('[data-action="download"]').addEventListener('click', (e) => {
+          e.stopPropagation();
+          downloadPost(data);
+        });
+
+        card.addEventListener('click', () => openModal(data));
+        elements.gridView.appendChild(card);
+      });
+    }
+
+    function savePost(postData) {
+      const postId = postData.id;
+      const existingIndex = state.savedPosts.findIndex(post => post.id === postId);
+      
+      if (existingIndex >= 0) {
+        state.savedPosts.splice(existingIndex, 1);
+        showToast('Post removed from saved', 'success');
+      } else {
+        const postToSave = {
+          id: postData.id,
+          title: postData.title,
+          author: postData.author,
+          score: postData.score,
+          url: postData.url_overridden_by_dest || postData.url,
+          thumbnail: postData.thumbnail,
+          isVideo: postData.is_video || postData.url_overridden_by_dest?.match(/\.(mp4|gifv)$/i),
+          permalink: postData.permalink,
+          timestamp: Date.now(),
+          over_18: postData.over_18 || false
+        };
+        
+        state.savedPosts.unshift(postToSave);
+        showToast('Post saved to bookmarks', 'success');
+      }
+      
+      localStorage.setItem('savedPosts', JSON.stringify(state.savedPosts));
+      
+      renderSavedPosts();
+      
+      const saveBtn = document.querySelector(`.card-action-btn[data-id="${postId}"][data-action="save"]`);
+      if (saveBtn) {
+        const isSaved = state.savedPosts.some(post => post.id === postId);
+        saveBtn.innerHTML = `<i class="fas ${isSaved ? 'fa-bookmark' : 'fa-bookmark'}"></i>`;
+      }
+    }
+
+    function downloadPost(postData) {
+      let url = '';
+      let filename = '';
+      
+      if (postData.url_overridden_by_dest?.match(/\.(jpg|jpeg|png|gif|webp)$/i) || postData.post_hint === 'image') {
+        url = postData.url_overridden_by_dest;
+        filename = `reddit-image-${postData.id}.${url.split('.').pop().split('?')[0]}`;
+      } else if (postData.is_video && postData.media?.reddit_video?.fallback_url) {
+        url = postData.media.reddit_video.fallback_url;
+        filename = `reddit-video-${postData.id}.mp4`;
+      } else if (postData.url_overridden_by_dest?.match(/\.(mp4|gifv)$/i)) {
+        url = postData.url_overridden_by_dest.replace('.gifv', '.mp4');
+        filename = `reddit-video-${postData.id}.mp4`;
+      } else if (postData.preview?.images?.[0]?.source?.url) {
+        url = postData.preview.images[0].source.url.replace(/&amp;/g, '&');
+        filename = `reddit-image-${postData.id}.jpg`;
+      } else {
+        showToast('Unsupported media type for download', 'error');
+        return;
+      }
+      
+      fetch(url)
+        .then(response => response.blob())
+        .then(blob => {
+          const blobUrl = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = blobUrl;
+          a.download = filename;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(blobUrl);
+          document.body.removeChild(a);
+          showToast('Download started!', 'success');
+        })
+        .catch(error => {
+          console.error('Download failed:', error);
+          showToast('Download failed. Please try again.', 'error');
+        });
+    }
+
+    function openModal(data) {
+      state.currentModalPost = data;
+      elements.modalMedia.innerHTML = '';
+      
+      if (data.is_gallery && data.media_metadata) {
+        const firstImageId = data.gallery_data.items[0].media_id;
+        const firstImage = data.media_metadata[firstImageId];
+        if (firstImage) {
+          const img = document.createElement('img');
+          img.className = 'modal-media';
+          img.src = firstImage.s.u || firstImage.p[0]?.u;
+          img.alt = data.title;
+          elements.modalMedia.appendChild(img);
+        }
+      } else if (data.url_overridden_by_dest?.match(/\.(jpg|jpeg|png|gif|webp)$/i) || data.post_hint === 'image') {
+        const img = document.createElement('img');
+        img.className = 'modal-media';
+        img.src = data.url_overridden_by_dest;
+        img.alt = data.title;
+        elements.modalMedia.appendChild(img);
+      } else if (data.is_video && data.media?.reddit_video?.hls_url) {
+        const video = document.createElement('video');
+        video.className = 'modal-media';
+        video.controls = true;
+        
+        if (Hls.isSupported()) {
+          const hls = new Hls();
+          hls.loadSource(data.media.reddit_video.hls_url);
+          hls.attachMedia(video);
+        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+          video.src = data.media.reddit_video.hls_url;
+        }
+        
+        elements.modalMedia.appendChild(video);
+      } else if (data.url_overridden_by_dest?.match(/\.(mp4|gifv)$/i)) {
+        const video = document.createElement('video');
+        video.className = 'modal-media';
+        video.controls = true;
+        video.src = data.url_overridden_by_dest.replace('.gifv', '.mp4');
+        elements.modalMedia.appendChild(video);
+      } else if (data.preview?.images?.[0]?.source?.url) {
+        const img = document.createElement('img');
+        img.className = 'modal-media';
+        img.src = data.preview.images[0].source.url.replace(/&amp;/g, '&');
+        img.alt = data.title;
+        elements.modalMedia.appendChild(img);
+      }
+
+      elements.modalTitle.textContent = data.title;
+      elements.modalAuthor.textContent = `u/${data.author}`;
+      elements.modalScore.textContent = data.score.toLocaleString();
+      elements.modalComments.textContent = data.num_comments.toLocaleString();
+      elements.redditLink.href = `https://reddit.com${data.permalink}`;
+      
+      updateSaveButtonState(data.id);
+      
+      elements.modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function updateSaveButtonState(postId) {
+      const isSaved = state.savedPosts.some(post => post.id === postId);
+      elements.saveBtn.innerHTML = `
+        <i class="fas fa-bookmark"></i>
+        ${isSaved ? 'Saved' : 'Save'}
+      `;
+      elements.saveBtn.style.backgroundColor = isSaved ? 'var(--success)' : '';
+    }
+
+    function closeModal() {
+      elements.modal.classList.remove('active');
+      document.body.style.overflow = '';
+      
+      const video = elements.modalMedia.querySelector('video');
+      if (video) {
+        video.pause();
+      }
+    }
+
+    function downloadMedia() {
+      if (!state.currentModalPost) return;
+      downloadPost(state.currentModalPost);
+    }
+
+    function saveCurrentPost() {
+      if (!state.currentModalPost) return;
+      savePost(state.currentModalPost);
+    }
+
+    function renderSavedPosts() {
+      elements.sidebarContent.innerHTML = '';
+      
+      if (state.savedPosts.length === 0) {
+        elements.sidebarContent.innerHTML = `
+          <div class="empty-state" style="padding: 16px;">
+            <i class="fas fa-bookmark"></i>
+            <p>No saved posts yet</p>
+          </div>
+        `;
+        return;
+      }
+      
+      state.savedPosts.forEach(post => {
+        const item = document.createElement('div');
+        item.className = 'sidebar-item';
+        item.innerHTML = `
+          ${post.over_18 ? '<div class="nsfw-tag" style="position: static; margin-bottom: 8px;">NSFW</div>' : ''}
+          <div class="sidebar-item-title">${post.title}</div>
+          <div class="sidebar-item-meta">
+            <span>u/${post.author}</span>
+            <span>•</span>
+            <span>${post.score.toLocaleString()}</span>
+            <i class="fas fa-arrow-up"></i>
+          </div>
+        `;
+        
+        item.addEventListener('click', () => {
+          const mockPost = {
+            data: {
+              id: post.id,
+              title: post.title,
+              author: post.author,
+              score: post.score,
+              num_comments: 0,
+              permalink: post.permalink,
+              url_overridden_by_dest: post.url,
+              is_video: post.isVideo,
+              thumbnail: post.thumbnail,
+              post_hint: post.isVideo ? 'hosted:video' : 'image',
+              over_18: post.over_18,
+              preview: post.thumbnail ? {
+                images: [{
+                  source: {
+                    url: post.thumbnail
+                  }
+                }]
+              } : null
+            }
+          };
+          
+          openModal(mockPost.data);
+          toggleSidebar();
+        });
+        
+        elements.sidebarContent.appendChild(item);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
