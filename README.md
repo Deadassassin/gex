@@ -20,7 +20,7 @@ To enable Reddit login, you must edit `server.js`.
    - **Name**: Anything
    - **Redirect URI**:  
      ```
-     http://localhost:8080
+     http://localhost:8080/callback
      ```
 
 4. Click **Create App**
@@ -30,7 +30,7 @@ To enable Reddit login, you must edit `server.js`.
 6. In `server.js`, find the Reddit section and set:
    ```js
    const CLIENT_ID = 'your-client-id-here';
-   const REDIRECT_URI = 'http://localhost:8080';
+   const REDIRECT_URI = 'http://localhost:8080/callback';
 ### Required Dependencies:
 1. Made simple copy and paste
 ```
