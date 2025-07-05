@@ -2,55 +2,500 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>URL Shortener</title>
   <style>
+    :root {
+      --primary: hsl(210, 75%, 60%);
+      --primary-dark: hsl(210, 65%, 50%);
+      --bg: hsl(0, 0%, 6%);
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text: hsl(0, 0%, 95%);
+      --text-muted: hsl(0, 0%, 65%);
+      --success: hsl(120, 60%, 55%);
+      --error: hsl(0, 80%, 60%);
+      --glass-blur: 20px;
+      --radius: 24px;
+      --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    * {
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: sans-serif;
-      background: #111;
-      color: #eee;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+      margin: 0;
+      padding: 20px;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      background-image: 
+        radial-gradient(at 80% 0%, hsla(210, 100%, 20%, 0.2) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(210, 100%, 20%, 0.2) 0px, transparent 50%);
     }
-    input, button {
-      padding: 0.5rem;
+    
+    @supports (font-variation-settings: normal) {
+      body { font-family: 'Inter var', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+    }
+    
+    .history-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-radius: var(--radius);
+      padding: 25px;
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.1),
+        0 0 0 1px var(--card-border);
+      overflow-y: auto;
+      max-height: calc(100vh - 40px);
+      position: sticky;
+      top: 20px;
+    }
+    
+    .history-panel h2 {
+      margin-top: 0;
+      color: var(--primary);
+      font-size: 1.3rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .url-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .url-item {
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .url-item:last-child {
+      border-bottom: none;
+    }
+    
+    .original-url {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 5px;
+    }
+    
+    .short-url {
+      font-size: 0.9rem;
+    }
+    
+    .short-url a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    
+    .short-url a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+    
+    .main-content {
+      max-width: 500px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      -webkit-backdrop-filter: blur(var(--glass-blur));
+      border-radius: var(--radius);
+      padding: 30px;
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.1),
+        0 0 0 1px var(--card-border);
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    }
+    
+    h1 {
+      margin: 0 0 25px;
+      font-size: 1.8rem;
+      text-align: center;
+      color: var(--primary);
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      background: linear-gradient(to right, var(--primary), hsl(210, 80%, 70%));
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(74, 144, 226, 0.2);
+    }
+    
+    .input-group {
+      margin-bottom: 24px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+    
+    input[type="url"] {
+      width: 100%;
+      padding: 14px 18px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: calc(var(--radius) - 8px);
       font-size: 1rem;
-      margin-top: 1rem;
+      background: rgba(0, 0, 0, 0.3);
+      color: var(--text);
+      transition: var(--transition);
+      font-family: inherit;
     }
+    
+    input[type="url"]:hover {
+      border-color: rgba(255,255,255,0.2);
+    }
+    
+    input[type="url"]:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+    }
+    
+    button {
+      width: 100%;
+      padding: 16px;
+      border: none;
+      border-radius: calc(var(--radius) - 8px);
+      background: var(--primary);
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      font-family: inherit;
+      position: relative;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+      opacity: 0;
+      transition: var(--transition);
+      z-index: -1;
+    }
+    
+    button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(74, 144, 226, 0.3);
+    }
+    
+    button:hover::before {
+      opacity: 1;
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button:disabled {
+      background: hsl(0, 0%, 30%);
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    
     .result {
-      margin-top: 2rem;
-      font-size: 1.1rem;
-      color: #0f0;
+      margin-top: 25px;
+      padding: 16px;
+      border-radius: calc(var(--radius) - 8px);
+      text-align: center;
+      font-size: 1rem;
+      transition: var(--transition);
+      transform-origin: top;
+      animation: fadeIn 0.3s ease-out;
+      background: rgba(0, 128, 0, 0.15);
+      border: 1px solid rgba(0, 128, 0, 0.2);
+      word-break: break-all;
+    }
+    
+    .result.error {
+      background: rgba(244, 67, 54, 0.15);
+      border: 1px solid rgba(244, 67, 54, 0.2);
+      color: var(--error);
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: var(--transition);
+      font-weight: 500;
+    }
+    
+    a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.15);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s ease-in-out infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .version {
+      position: fixed;
+      bottom: 12px;
+      right: 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      opacity: 0.7;
+      transition: var(--transition);
+    }
+    
+    .version:hover {
+      opacity: 1;
+    }
+    
+    .copy-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 4px;
+      color: var(--text);
+      padding: 2px 6px;
+      font-size: 0.7rem;
+      margin-left: 5px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .copy-btn:hover {
+      background: var(--primary);
+    }
+    
+    @media (max-width: 900px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      
+      .history-panel {
+        max-height: 200px;
+        position: static;
+        margin-bottom: 20px;
+      }
+      
+      .main-content {
+        max-width: 100%;
+      }
+    }
+    
+    @media (max-width: 600px) {
+      :root {
+        --radius: 20px;
+      }
+      
+      body {
+        padding: 12px;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      h1 {
+        font-size: 1.6rem;
+      }
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>Shorten a URL</h1>
-  <form id="shortenForm">
-    <input type="url" id="urlInput" placeholder="https://example.com" required size="40">
-    <br>
-    <button type="submit">Shorten</button>
-  </form>
-  <div class="result" id="result"></div>
+  <aside class="history-panel">
+    <h2>Shortened URLs</h2>
+    <ul class="url-list" id="urlList">
+      <!-- URLs will be added here dynamically -->
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <div class="card">
+      <h1>URL Shortener</h1>
+      
+      <form id="shortenForm">
+        <div class="input-group">
+          <input type="url" id="urlInput" placeholder="https://example.com" required>
+        </div>
+        
+        <button type="submit" id="submitBtn">
+          <span id="submitBtnText">Shorten URL</span>
+          <span id="submitBtnLoader" class="loading" style="display: none;"></span>
+        </button>
+      </form>
+      
+      <div class="result" id="result" style="display: none;"></div>
+    </div>
+  </main>
+
+  <div class="version">v1.2.0</div>
 
   <script>
-    document.getElementById('shortenForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const url = document.getElementById('urlInput').value;
-      const res = await fetch('/shorten', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url })
+    const form = document.getElementById('shortenForm');
+    const urlInput = document.getElementById('urlInput');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+    const submitBtnLoader = document.getElementById('submitBtnLoader');
+    const result = document.getElementById('result');
+    const urlList = document.getElementById('urlList');
+    
+    // Load existing URLs on page load
+    document.addEventListener('DOMContentLoaded', loadUrls);
+
+    async function loadUrls() {
+      try {
+        const res = await fetch('/api/shortened-urls');
+        const data = await res.json();
+      
+        if (data.success && data.links && data.links.length > 0) {
+          urlList.innerHTML = data.links.map(link => createUrlItem(link)).join('');
+          addCopyButtons?.(); // optional
+        } else {
+          urlList.innerHTML = '<li style="color: var(--text-muted); font-size: 0.9rem;">No URLs shortened yet</li>';
+        }
+      } catch (error) {
+        console.error('Failed to load URLs:', error);
+        urlList.innerHTML = '<li style="color: var(--error); font-size: 0.9rem;">Failed to load URLs</li>';
+      }
+    }
+
+    
+    function createUrlItem(link) {
+      const shortUrl = `${location.origin}/${link.id}`;
+      return `
+        <li style="margin-bottom: 12px;">
+          <span style="font-size: 0.95rem; color: var(--primary);">${shortUrl}</span>
+          <button onclick="navigator.clipboard.writeText('${shortUrl}')" style="margin-left: 8px; padding: 4px 8px; font-size: 0.8rem;">Copy</button>
+        </li>
+      `;
+    }
+    
+    function addCopyButtons() {
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          const url = btn.getAttribute('data-url');
+          navigator.clipboard.writeText(url).then(() => {
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => {
+              btn.textContent = originalText;
+            }, 2000);
+          });
+        });
       });
-      const data = await res.json();
-      const result = document.getElementById('result');
-      if (data.success) {
-        result.innerHTML = 'Shortened URL: <a href="' + data.short + '" target="_blank">' + data.short + '</a>';
-      } else {
-        result.textContent = 'Error: ' + data.message;
+    }
+    
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = urlInput.value.trim();
+      
+      if (!url) {
+        showResult('Please enter a valid URL', true);
+        return;
+      }
+      
+      try {
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtnText.textContent = 'Shortening...';
+        submitBtnLoader.style.display = 'inline-block';
+        result.style.display = 'none';
+        
+        const res = await fetch('/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        
+        const data = await res.json();
+        
+        if (data.success) {
+          showResult(`Shortened URL: <a href="${data.short}" target="_blank">${data.short}</a>`);
+          urlInput.value = '';
+          // Add the new URL to the top of the list
+          const newId = data.short.split('/').pop();
+          const newUrlItem = createUrlItem({ id: newId });
+          if (urlList.firstChild && urlList.firstChild.textContent.includes('No URLs')) {
+            urlList.innerHTML = newUrlItem;
+          } else {
+            urlList.insertAdjacentHTML('afterbegin', newUrlItem);
+          }
+          addCopyButtons();
+        } else {
+          showResult('Error: ' + data.message, true);
+        }
+      } catch (error) {
+        console.error('Shortening failed:', error);
+        showResult('Error: Failed to shorten URL', true);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtnText.textContent = 'Shorten URL';
+        submitBtnLoader.style.display = 'none';
       }
     });
+    
+    function showResult(message, isError = false) {
+      result.innerHTML = message;
+      result.className = isError ? 'result error' : 'result';
+      result.style.display = 'block';
+    }
+    
+    // Focus input on page load
+    urlInput.focus();
   </script>
 </body>
 </html>
