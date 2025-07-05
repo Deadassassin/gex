@@ -1,6 +1,3 @@
-
-// server.js (fixed version for Yandex interception)
-
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
