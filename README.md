@@ -77,8 +77,8 @@ URL shortening with persistent JSON storage
 
 Media scraping using Axios with Puppeteer fallback for dynamic content
 
-Direct download preview for file size, type, and name
+Optional subreddit media scrape
 
 Optional real-time chat system using WebSocket
 
-Optional system monitoring that logs request activity, IP, location, and system usage
+Included web pages still in development from project rip.
